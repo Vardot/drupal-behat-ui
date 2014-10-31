@@ -228,6 +228,10 @@ function _behat_ui_new($form, $form_state) {
     '#suffix' => '</div>',
   );
 
+  if (!isset($form_state['storage'])) {
+    $form_state['storage'] = array('steps' => 0);
+  }
+
   // Remove blank steps
   if (!isset($form_state['input']['behat_ui_steps'])) {
     $form_state['input']['behat_ui_steps'] = array();
@@ -239,9 +243,6 @@ function _behat_ui_new($form, $form_state) {
     }
   }
   
-  if (!isset($form_state['storage'])) {
-    $form_state['storage'] = array('steps' => 0);
-  }
   $form_state['storage']['steps']++;
 
   if ($form_state['storage']['steps']) {

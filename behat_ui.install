@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the behat_ui module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function behat_ui_install() {
+  $t = get_t();
+  drupal_set_message($t("Automated tests using Behat/Mink, Run tests, and create tests under !link",
+    array('!link' => l($t('Administration -> Configuration -> Development -> Behat UI'), 'admin/config/development/behat_ui'))
+  ));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function behat_ui_uninstall() {
+  // Delete variables.
+  variable_del('behat_ui_pidfile');
+  variable_del('behat_ui_outfile');
+  variable_del('behat_ui_html_report_dir');
+
+  // Clear all cache for the bootstrap.
+  cache_clear_all('variables', 'cache_bootstrap');
+}

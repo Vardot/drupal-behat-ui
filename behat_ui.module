@@ -488,7 +488,7 @@ function _behat_ui_load_javascript($form, &$form_state) {
  */
 function _behat_ui_load_javascript_for_new($form, &$form_state) {
   drupal_add_js(drupal_get_path('module', 'behat_ui') . '/js/behat_ui_new.js');
-  drupal_add_js(drupal_get_path('module', 'behat_ui') . '/js/jquery.simplemodal.1.4.4.min.js');
+  drupal_add_js(drupal_get_path('module', 'behat_ui') . '/js/jquery.simplemodal.js');
   return $form;
 }
 

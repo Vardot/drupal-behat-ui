@@ -75,7 +75,7 @@ function behat_ui_menu() {
 
 function _behat_ui_autocomplete($string) {
   $matches = array();
-  
+
   $steps = explode('<br />', _behat_ui_steps());
   foreach ($steps as $step) {
     $title = preg_replace('/^\s*(Given|Then|When) \/\^/', '', $step);
@@ -84,7 +84,7 @@ function _behat_ui_autocomplete($string) {
       $matches[$title] = $title;
     }
   }
-  
+
   drupal_json_output($matches);
 }
 
@@ -152,7 +152,7 @@ function _behat_ui_settings($form, $form_state) {
   );
 
   $form['#after_build'] = array('_behat_ui_load_javascript');
-  
+
   $form['actions']['#type'] = 'actions';
   $form['actions']['submit'] = array(
     '#type' => 'submit',
@@ -260,7 +260,7 @@ function _behat_ui_new($form, $form_state) {
     for ($i = 0; $i < $form_state['storage']['steps']; $i++) {
       $form['behat_ui_new_scenario']['behat_ui_steps'][$i] = array(
         '#type' => 'fieldset',
-        '#collapsible' => FALSE, 
+        '#collapsible' => FALSE,
         '#collapsed' => FALSE,
         '#tree' => TRUE,
       );
@@ -270,7 +270,7 @@ function _behat_ui_new($form, $form_state) {
         '#options' => array('' => '', 'And' => 'And', 'Given' => 'Given', 'When' => 'When', 'Then' => 'Then'),
         '#default_value' => '',
       );
-      
+
       $form['behat_ui_new_scenario']['behat_ui_steps'][$i]['step'] = array(
         '#type' => 'textfield',
         '#autocomplete_path' => 'behat-ui/autocomplete',
@@ -335,7 +335,7 @@ function _behat_ui_generate_scenario($form_state) {
 
 
   $steps_count = count($form_state['values']['behat_ui_steps']);
-  
+
   for ($i = 0; $i < $steps_count; $i++) {
     $type = $form_state['values']['behat_ui_steps'][$i]['type'];
     $step = $form_state['values']['behat_ui_steps'][$i]['step'];
@@ -395,13 +395,9 @@ function _behat_ui_create($form, &$form_state) {
   $behat_bin = variable_get('behat_ui_behat_bin_path', 'bin/behat');
   $behat_config_path = variable_get('behat_ui_behat_config_path', '.');
   $features_path = 'features';
-  if (extension_loaded('yaml')) {
-    $behat_config = yaml_parse(file_get_contents($behat_config_path . '/behat.yml'));
-    $features_path = $behat_config['default']['paths']['features'];
-  }
-  else {
-    drupal_set_message(t('Extension yaml is not loaded. Could not parse behat.yml file.'), 'error');
-  }
+
+  // Attempt to load the config with Composer library first
+  $behat_config = load_behat_config();
 
   // Temporary file
   $tmp = file_directory_temp();
@@ -426,7 +422,7 @@ function _behat_ui_create($form, &$form_state) {
   );
   file_transfer('temporary://' . $name, $headers);
   // Can't unlink here, because file_transfer, above, calls drupal_exit()
-  // unlink($file); 
+  // unlink($file);
 }
 
 /**
@@ -454,13 +450,10 @@ function _behat_ui_steps() {
 function _behat_ui_features() {
   $behat_config_path = variable_get('behat_ui_behat_config_path', '.');
   $features_path = 'features';
-  if (extension_loaded('yaml')) {
-    $behat_config = yaml_parse(file_get_contents($behat_config_path . '/behat.yml'));
-    $features_path = $behat_config['default']['paths']['features'];
-  }
-  else {
-    drupal_set_message(t('Extension yaml is not loaded. Could not parse behat.yml file.'), 'error');
-  }
+
+  // Attempt to load the config with Composer library first
+  $behat_config = load_behat_config();
+  
   $features = array();
 
   if ($handle = opendir($behat_config_path . '/' . $features_path)) {
@@ -592,6 +585,46 @@ function _behat_ui_kill() {
   }
 
   drupal_json_output(array('response' => $response));
+}
+
+/**
+ * Adding support for the Symfony yaml parser so everything can be setup through Composer
+ *
+ * @return array
+ */
+function load_behat_config() {
+
+  $behat_config = array();
+  
+  $behat_config_path = _behat_ui_get_behat_config_path();
+  
+  $behat_bin = variable_get('behat_ui_behat_bin_path', 'bin/behat');
+  $behat_config_path = variable_get('behat_ui_behat_config_path', '.');
+
+  try {
+    if (is_file($autoload = $behat_config_path . '/vendor/autoload.php')) {
+      require $autoload;
+    } else {
+
+      $error_message = 'You must set up the project dependencies, run the following commands:'.PHP_EOL.
+          'curl -s http://getcomposer.org/installer | php'.PHP_EOL.
+          'php composer.phar install'.PHP_EOL;
+      
+      drupal_set_message(
+        t($error_message), 'error');
+      watchdog('behat_ui', t($error_message), WATCHDOG_ERROR);
+    }
+    
+    $behat_config_factory = new Behat\Testwork\ServiceContainer\Configuration\ConfigurationLoader();
+    $behat_config_factory->setConfigurationFilePath($behat_config_path . '/behat.yml');
+    $behat_config = $behat_config_factory->loadConfiguration();
+    
+  }
+  catch (ParseException $e) {
+    drupal_set_message(t('Extension yaml is not loaded. Could not parse behat.yml file.'), 'error');
+    watchdog('behat_ui', t('Could not parse Behat config file, check Composer libraries, file permissions and Behat config: Error = @error', array('@error' => $e)), WATCHDOG_ERROR);
+  }
+  return($behat_config);
 }
 
 /**

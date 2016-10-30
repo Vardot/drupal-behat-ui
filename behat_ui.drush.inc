@@ -1,12 +1,17 @@
 <?php
 
 /**
- * Implementation of hook_drush_command().
+ * @file
+ * Behat ui drush commands.
+ */
+
+/**
+ * Implements hook_drush_command().
  */
 function behat_ui_drush_command() {
   $items = array();
 
-  // The 'behat-ui' command
+  // The 'behat-ui' command.
   $items['behat-ui'] = array(
     'description' => "Runs your Behat testing suite.",
     'arguments' => array(),
@@ -15,14 +20,15 @@ function behat_ui_drush_command() {
       'drush bui' => 'Runs the testing suite.',
     ),
     'aliases' => array('bui'),
-    'bootstrap' => DRUSH_BOOTSTRAP_DRUSH, // No bootstrap at all.
+  // No bootstrap at all.
+    'bootstrap' => DRUSH_BOOTSTRAP_DRUSH,
   );
-  
+
   return $items;
 }
 
 /**
- * Implementation of hook_drush_help().
+ * Implements hook_drush_help().
  */
 function behat_ui_drush_help($section) {
   switch ($section) {

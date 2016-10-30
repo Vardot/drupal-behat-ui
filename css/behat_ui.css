@@ -6,10 +6,6 @@
   font-size: 12px;
   border: 1px solid #333;
   background: #ffe;
-  /*
-  word-wrap: normal;
-  white-space: pre;
-  */
 }
 
 #behat-ui-output * {
@@ -28,7 +24,7 @@
 
 #behat-ui-status span {
   color: #a00;
-  padding-left: 18px; 
+  padding-left: 18px;
 }
 
 #behat-ui-status.running span {
@@ -48,7 +44,8 @@
   display: none;
 }
 
-#behat-ui-new-scenario, #behat-ui-scenario-output {
+#behat-ui-new-scenario,
+#behat-ui-scenario-output {
   width: 40%;
 }
 
@@ -193,8 +190,4 @@
 
 #behat-ui-new-steps .remove:hover {
   background-image: url(remove-hover.png);
-}
-
-#behat-ui-status a.download {
-  margin-left: 18px;
 }

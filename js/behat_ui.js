@@ -1,7 +1,9 @@
-/*jslint nomen: true, plusplus: true, todo: true, white: true, browser: true, indent: 2 */
+/**
+ * @file
+ * Jslint nomen: true, plusplus: true, todo: true, white: true, browser: true, indent: 2.
+ */
 
-jQuery(function($) {
-  'use strict';
+(function ($, Drupal, window, document, undefined) {
 
   var killProcess = function() {
     $('#behat-ui-kill').click(function() {
@@ -12,7 +14,8 @@ jQuery(function($) {
           if (data.response) {
             console.log(Drupal.t('Process killed'));
             checkStatus();
-          } else {
+          }
+          else {
             console.log(Drupal.t('Could not kill process'));
           }
         },
@@ -24,7 +27,7 @@ jQuery(function($) {
     });
   };
 
-  var checkStatus = function() { 
+  var checkStatus = function() {
     var $stat = $('#behat-ui-status'),
         $output = $('#behat-ui-output');
 
@@ -39,13 +42,9 @@ jQuery(function($) {
           $stat.find('span').html(Drupal.t('Running <small><a href="#" id="behat-ui-kill">(kill)</a></small>'));
           killProcess();
           setTimeout(checkStatus, 10000);
-        } else {
-          var download = ' <a href="' + Drupal.settings.basePath + 'behat-ui/download/html" class="download">' + Drupal.t('Download output as HTML') + '</a>' +
-                         ' <a href="' + Drupal.settings.basePath + 'behat-ui/download/txt" class="download">' + Drupal.t('Download output as plain text') + '</a>';
-          if (!data.output) {
-            download = '';
-          }
-          $stat.find('span').html(Drupal.t('Not running') + download);
+        }
+        else {
+          $stat.find('span').html(Drupal.t('Not running'));
         }
 
         $output.html(data.output);
@@ -57,6 +56,8 @@ jQuery(function($) {
       }
     });
   }
+
   checkStatus();
   killProcess();
-});
+
+})(jQuery, Drupal, this, this.document);

@@ -1,8 +1,10 @@
 <?php
 /**
  * @file
- * Main behat_ui file
+ * Main behat_ui file.
  */
+
+use Behat\Testwork\ServiceContainer\Configuration\ConfigurationLoader;
 
 /**
  * Implements hook_init().
@@ -10,7 +12,8 @@
 function behat_ui_init() {
   // Alerts break tests, so let's replace them by console.log
   // Clearly this is not the best approach... but the others didn't work! :(
-  // I tried: Behat hooks (beforeStep, afterStep), set cookie on Behat, send HTTP headers on Behat, etc.
+  // I tried: Behat hooks (beforeStep, afterStep), set cookie on Behat, send
+  // HTTP headers on Behat, etc.
   drupal_add_js('window.alert = function(message) { if (console) console.log(message); }', 'inline');
 }
 
@@ -54,7 +57,7 @@ function behat_ui_menu() {
   $items['behat-ui/autocomplete'] = array(
     'page callback' => '_behat_ui_autocomplete',
     'access arguments' => array('administer site configuration'),
-    'type' => MENU_CALLBACK
+    'type' => MENU_CALLBACK,
   );
 
   $items['behat-ui/kill'] = array(
@@ -73,6 +76,9 @@ function behat_ui_menu() {
   return $items;
 }
 
+/**
+ * Behat Ui autocomplate.
+ */
 function _behat_ui_autocomplete($string) {
   $matches = array();
 
@@ -142,7 +148,7 @@ function _behat_ui_settings($form, $form_state) {
   }
   $form['behat_ui_status'] = array(
     '#type' => 'markup',
-    '#markup' => '<p id="behat-ui-status" class="'. $class .'">' . t('Status:') . ' <span>' . $label . '</span></p>',
+    '#markup' => '<p id="behat-ui-status" class="' . $class . '">' . t('Status:') . ' <span>' . $label . '</span></p>',
   );
 
   $form['behat_ui_output'] = array(
@@ -215,7 +221,7 @@ function _behat_ui_new($form, $form_state) {
     '#suffix' => '</div>',
     '#ajax' => array(
       'callback' => '_behat_ui_run_single_test',
-      'wrapper' => 'behat-ui-output-inner'
+      'wrapper' => 'behat-ui-output-inner',
     ),
   );
 
@@ -239,7 +245,7 @@ function _behat_ui_new($form, $form_state) {
     $form_state['input'] = array();
   }
 
-  // Remove blank steps
+  // Remove blank steps.
   if (!isset($form_state['input']['behat_ui_steps'])) {
     $form_state['input']['behat_ui_steps'] = array();
   }
@@ -267,7 +273,13 @@ function _behat_ui_new($form, $form_state) {
 
       $form['behat_ui_new_scenario']['behat_ui_steps'][$i]['type'] = array(
         '#type' => 'select',
-        '#options' => array('' => '', 'And' => 'And', 'Given' => 'Given', 'When' => 'When', 'Then' => 'Then'),
+        '#options' => array(
+          '' => '',
+          'And' => 'And',
+          'Given' => 'Given',
+          'When' => 'When',
+          'Then' => 'Then',
+        ),
         '#default_value' => '',
       );
 
@@ -333,7 +345,6 @@ function _behat_ui_generate_scenario($form_state) {
   $title = $form_state['values']['behat_ui_title'];
   $scenario .= "\nScenario: $title\n";
 
-
   $steps_count = count($form_state['values']['behat_ui_steps']);
 
   for ($i = 0; $i < $steps_count; $i++) {
@@ -341,7 +352,8 @@ function _behat_ui_generate_scenario($form_state) {
     $step = $form_state['values']['behat_ui_steps'][$i]['step'];
 
     if (!empty($type) && !empty($step)) {
-      $step = preg_replace('/\n\|/', "\n  |", preg_replace('/([:\|])\|/', "$1\n|", $step)); // Blocks
+      // Blocks.
+      $step = preg_replace('/\n\|/', "\n  |", preg_replace('/([:\|])\|/', "$1\n|", $step));
       $scenario .= "  $type $step\n";
     }
   }
@@ -349,10 +361,16 @@ function _behat_ui_generate_scenario($form_state) {
   return $scenario;
 }
 
+/**
+ * Behat UI get behat bin path.
+ */
 function _behat_ui_get_behat_bin_path() {
   return preg_replace('/[ ;&|,]/', '', variable_get('behat_ui_behat_bin_path', 'bin/behat'));
 }
 
+/**
+ * Behat UI get behat config path.
+ */
 function _behat_ui_get_behat_config_path() {
   return preg_replace('/[ ;&|,]/', '', variable_get('behat_ui_behat_config_path', '.'));
 }
@@ -363,9 +381,12 @@ function _behat_ui_get_behat_config_path() {
 function _behat_ui_run_single_test($form, &$form_state) {
   global $user, $base_root;
 
-  // Write to temporary file
-  $tmp = file_directory_temp();
-  $file = $tmp . '/' . $user->uid . '-' . time() . '.feature';
+  $behat_bin = _behat_ui_get_behat_bin_path();
+  $behat_config = _behat_ui_get_behat_config_path();
+
+  // Write to temporary file.
+  $file_user_time = 'user-' . $user->uid . '-' . date('Y-m-d_h-m-s');
+  $file = $behat_config . '/features/tmp/' . $file_user_time . '.feature';
   $feature = $form_state['values']['behat_ui_feature'];
   $test = "Feature: $feature\n  In order to test \"$feature\"\n\n";
   $test .= _behat_ui_generate_scenario($form_state);
@@ -373,15 +394,25 @@ function _behat_ui_run_single_test($form, &$form_state) {
   fwrite($handle, $test);
   fclose($handle);
 
-  // Run file
-  $behat_bin = _behat_ui_get_behat_bin_path();
-  $behat_config = _behat_ui_get_behat_config_path();
-  $output = shell_exec("cd $behat_config; (MINK_EXTENSION_PARAMS='base_url=$base_root' php $behat_bin -f html $file 2>&1)");
+  // Run file.
+  $report_dir = $behat_config . '/reports/report-' . $file_user_time;
+  $output = shell_exec("cd $behat_config; $behat_bin $file --format html --out $report_dir");
+
+  $report_html_file_name_and_path = $report_dir . '/index.html';
+
+  $report_html_handle = fopen($report_html_file_name_and_path, 'r');
+  $report_html = fread($report_html_handle, filesize($report_html_file_name_and_path));
+  fclose($report_html_handle);
+
+  $output .= $report_html;
 
   unlink($file);
   return '<div id="behat-ui-output-inner">' . $output . '</div>';
 }
 
+/**
+ * Behat Ui add step AJAX.
+ */
 function behat_ui_ajax_add_step($form, $form_state) {
   return $form['behat_ui_new_scenario']['behat_ui_steps'];
 }
@@ -392,37 +423,29 @@ function behat_ui_ajax_add_step($form, $form_state) {
 function _behat_ui_create($form, &$form_state) {
   global $user, $base_root;
 
-  $behat_bin = variable_get('behat_ui_behat_bin_path', 'bin/behat');
-  $behat_config_path = variable_get('behat_ui_behat_config_path', '.');
-  $features_path = 'features';
+  $behat_bin = _behat_ui_get_behat_bin_path();
+  $behat_config = _behat_ui_get_behat_config_path();
 
-  // Attempt to load the config with Composer library first
-  $behat_config = load_behat_config();
-
-  // Temporary file
-  $tmp = file_directory_temp();
-  $name = $user->uid . '-' . time() . '.feature';
-  $file = $tmp . '/' . $name;
-
-  // Concatenate existing feature with new scenario
+  // Write to temporary file.
+  $file_user_time = 'user-' . $user->uid . '-' . date('Y-m-d_h-m-s');
+  $file = $behat_config . '/features/tmp/' . $file_user_time . '.feature';
   $feature = $form_state['values']['behat_ui_feature'];
-  $content = file_get_contents($behat_config_path . '/' . $features_path . '/' . $feature . '.feature');
-  $scenario = _behat_ui_generate_scenario($form_state);
-
-  // Write file
+  $scenario = "Feature: $feature\n  In order to test \"$feature\"\n\n";
+  $scenario .= _behat_ui_generate_scenario($form_state);
   $handle = fopen($file, 'w+');
-  fwrite($handle, $content . "\n" . $scenario);
+  fwrite($handle, $test);
   fclose($handle);
 
-  // Send file
+  $file_name = $file_user_time . '.feature';
+  $file_size = filesize($file);
+  // unlink($file);
+  // Send file.
   $headers = array(
     'Content-Type' => 'text/x-behat',
     'Content-Disposition' => 'attachment; filename="' . "$feature.feature" . '"',
-    'Content-Length' => filesize($file),
+    'Content-Length' => $file_size,
   );
-  file_transfer('temporary://' . $name, $headers);
-  // Can't unlink here, because file_transfer, above, calls drupal_exit()
-  // unlink($file);
+  file_transfer('temporary://' . $file, $headers);
 }
 
 /**
@@ -437,7 +460,7 @@ function _behat_ui_steps() {
   $behat_config_path = _behat_ui_get_behat_config_path();
 
   global $base_root;
-  $cmd = "cd $behat_config_path; (MINK_EXTENSION_PARAMS='base_url=$base_root' php $behat_bin -dl | sed 's/^\s*//g' | sort)";
+  $cmd = "cd $behat_config_path; $behat_bin -dl | sed 's/^\s*//g' | sort";
   $output = shell_exec($cmd);
   $output = nl2br(htmlentities($output));
   cache_set('behat_ui_steps', $output, 'cache');
@@ -451,13 +474,13 @@ function _behat_ui_features() {
   $behat_config_path = variable_get('behat_ui_behat_config_path', '.');
   $features_path = 'features';
 
-  // Attempt to load the config with Composer library first
+  // Attempt to load the config with Composer library first.
   $behat_config = load_behat_config();
-  
+
   $features = array();
 
   if ($handle = opendir($behat_config_path . '/' . $features_path)) {
-    while (false !== ($file = readdir($handle))) {
+    while (FALSE !== ($file = readdir($handle))) {
       if (preg_match('/\.feature$/', $file)) {
         $feature = preg_replace('/\.feature$/', '', $file);
         $name = ucfirst(str_replace('_', ' ', $feature));
@@ -489,18 +512,16 @@ function _behat_ui_load_javascript_for_new($form, &$form_state) {
  * Submit function.
  */
 function _behat_ui_submit($form, &$form_state) {
-  global $base_root;
+  global $base_root, $user;
 
-  // Paths
-
+  // Paths.
   variable_set('behat_ui_behat_bin_path', $form_state['values']['behat_ui_behat_bin_path']);
   variable_set('behat_ui_behat_config_path', $form_state['values']['behat_ui_behat_config_path']);
 
   $behat_bin = _behat_ui_get_behat_bin_path();
   $behat_config_path = _behat_ui_get_behat_config_path();
 
-  // HTTP authentication
-
+  // HTTP authentication.
   variable_set('behat_ui_http_user', $form_state['values']['behat_ui_http_user']);
   if (!empty($form_state['values']['behat_ui_http_password'])) {
     variable_set('behat_ui_http_password', $form_state['values']['behat_ui_http_password']);
@@ -515,20 +536,24 @@ function _behat_ui_submit($form, &$form_state) {
     $url = preg_replace('/([^\/])$/', "$1/", $url);
   }
 
-  // Run tests
-
+  // Run tests.
   $pidfile = variable_get('behat_ui_pidfile', '');
   $pid = empty($pidfile) ? 0 : intval(trim(file_get_contents($pidfile)));
   $outfile = variable_get('behat_ui_outfile', '');
 
   if (!$pid && empty($file)) {
-    $tmp = file_directory_temp();
-    $cmd = "MINK_EXTENSION_PARAMS='base_url=$url' php $behat_bin -f html";
-    $outfile = $tmp . '/behat-ui-' . time() . '.log';
-    $pidfile = $tmp . '/behat-ui-' . time() . '.pid';
-    exec(sprintf("cd $behat_config_path; %s > %s 2>&1 & echo $! > %s", $cmd, $outfile, $pidfile));
+
+    $file_user_time = 'user-' . $user->uid . '-' . date('Y-m-d_h-m-s');
+
+    $outfile = $behat_config_path . '/logs/behat-ui-' . $file_user_time . '.log';
+    $pidfile = $behat_config_path . '/pids/behat-ui-' . $file_user_time . '.pid';
+    $report_dir = 'reports/report-' . $file_user_time;
+
+    exec("cd $behat_config_path; $behat_bin --format pretty --out std --format html --out $report_dir > $outfile & echo $! > $pidfile");
+
     variable_set('behat_ui_pidfile', $pidfile);
     variable_set('behat_ui_outfile', $outfile);
+    variable_set('behat_ui_html_report_dir', $report_dir);
   }
   else {
     drupal_set_message(t('Tests are already running.'));
@@ -539,29 +564,31 @@ function _behat_ui_submit($form, &$form_state) {
  * Function to get tests status.
  */
 function _behat_ui_status() {
+
+  $behat_config_path = _behat_ui_get_behat_config_path();
+
   $pidfile = variable_get('behat_ui_pidfile', '');
   $pid = empty($pidfile) ? 0 : intval(trim(file_get_contents($pidfile)));
   $outfile = variable_get('behat_ui_outfile', '');
-  $output = file_get_contents($outfile);
+  $output = file_get_contents($behat_config_path . '/' . variable_get('behat_ui_html_report_dir', '') . '/index.html');
 
-  $running = false;
+  $running = FALSE;
 
   if ($pid) {
     try {
       $result = shell_exec(sprintf("ps %d", $pid));
       if (count(preg_split("/\n/", $result)) > 2) {
-        $running = true;
+        $running = TRUE;
       }
-    } catch (Exception $e) {
-      // Do nothing
+    }
+    catch (Exception $e) {
+      // Do nothing.
     }
 
     if (!$running) {
-      unlink($pidfile);
-      $tmp = file_directory_temp();
-      rename($outfile, $tmp . '/behat_ui_output.html');
       variable_set('behat_ui_pidfile', '');
       variable_set('behat_ui_outfile', '');
+      variable_set('behat_ui_html_report_dir', '');
     }
   }
 
@@ -579,7 +606,8 @@ function _behat_ui_kill() {
   if ($pid) {
     try {
       $response = posix_kill($pid, SIGKILL);
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       $response = FALSE;
     }
   }
@@ -588,53 +616,60 @@ function _behat_ui_kill() {
 }
 
 /**
- * Adding support for the Symfony yaml parser so everything can be setup through Composer
+ * Load Behat Config.
+ *
+ * Adding support for the Symfony yaml parser so everything can be setup
+ * through Composer.
  *
  * @return array
+ *   Behat config.
  */
 function load_behat_config() {
 
   $behat_config = array();
-  
+
+  $behat_bin = _behat_ui_get_behat_bin_path();
   $behat_config_path = _behat_ui_get_behat_config_path();
-  
-  $behat_bin = variable_get('behat_ui_behat_bin_path', 'bin/behat');
-  $behat_config_path = variable_get('behat_ui_behat_config_path', '.');
 
   try {
     if (is_file($autoload = $behat_config_path . '/vendor/autoload.php')) {
       require $autoload;
-    } else {
-
-      $error_message = 'You must set up the project dependencies, run the following commands:'.PHP_EOL.
-          'curl -s http://getcomposer.org/installer | php'.PHP_EOL.
-          'php composer.phar install'.PHP_EOL;
-      
-      drupal_set_message(
-        t($error_message), 'error');
-      watchdog('behat_ui', t($error_message), WATCHDOG_ERROR);
     }
-    
-    $behat_config_factory = new Behat\Testwork\ServiceContainer\Configuration\ConfigurationLoader();
+    else {
+
+      $error_message = t('You must set up the project dependencies, run the following commands:') . PHP_EOL .
+          'curl -s http://getcomposer.org/installer | php' . PHP_EOL .
+          'php composer.phar install' . PHP_EOL;
+
+      drupal_set_message($error_message, 'error');
+      watchdog('behat_ui', $error_message, WATCHDOG_ERROR);
+    }
+
+    $behat_config_factory = new ConfigurationLoader();
     $behat_config_factory->setConfigurationFilePath($behat_config_path . '/behat.yml');
     $behat_config = $behat_config_factory->loadConfiguration();
-    
+
   }
   catch (ParseException $e) {
     drupal_set_message(t('Extension yaml is not loaded. Could not parse behat.yml file.'), 'error');
-    watchdog('behat_ui', t('Could not parse Behat config file, check Composer libraries, file permissions and Behat config: Error = @error', array('@error' => $e)), WATCHDOG_ERROR);
+    $watchdog_message = t('Could not parse Behat config file, check Composer libraries, file permissions and Behat config: Error = @error', array('@error' => $e));
+    watchdog('behat_ui', $watchdog_message, WATCHDOG_ERROR);
   }
-  return($behat_config);
+  return ($behat_config);
 }
 
 /**
  * Save output.
  */
 function _behat_ui_download($format) {
-  $tmp = file_directory_temp();
-  $output = $tmp . '/behat_ui_output.html';
+
+  $behat_bin = _behat_ui_get_behat_bin_path();
+  $behat_config_path = _behat_ui_get_behat_config_path();
 
   if (($format === 'html' || $format === 'txt') && file_exists($output)) {
+
+    $output = variable_get('behat_ui_html_report_dir', '');
+
     $headers = array(
       'Content-Type' => 'text/x-behat',
       'Content-Disposition' => 'attachment; filename="behat_ui_output.' . $format . '"',
@@ -646,11 +681,11 @@ function _behat_ui_download($format) {
     if ($format === 'html') {
       readfile($output);
     }
-    else if ($format === 'txt') {
+    elseif ($format === 'txt') {
       drupal_add_http_header('Connection', 'close');
+
+      $output = variable_get('behat_ui_outfile', '');
       $plain = file_get_contents($output);
-      $plain = preg_replace('/<(script|style)(.*?)>(.*?)<\/(script|style)>/s', '', $plain);
-      $plain = preg_replace('/<div class="switchers">(.*?)<\/div>/s', '', $plain);
       echo drupal_html_to_text($plain);
     }
   }

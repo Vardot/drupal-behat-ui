@@ -43,11 +43,11 @@ function behat_ui_drush_help($section) {
 function drush_behat_ui() {
   global $base_root;
 
-  $username = variable_get('behat_ui_http_user', '');
-  $password = variable_get('behat_ui_http_password', '');
+  $username = \Drupal::config('behat_ui.settings')->get('behat_ui_http_user');
+  $password = \Drupal::config('behat_ui.settings')->get('behat_ui_http_password');
 
   $url = $base_root;
-  if (!empty($username) && !empty($password) && !variable_get('behat_ui_http_auth_headless_only', 0)) {
+  if (!empty($username) && !empty($password) && !\Drupal::config('behat_ui.settings')->get('behat_ui_http_auth_headless_only')) {
     $url = preg_replace('/^(https?:\/\/)/', "$1$username:$password@", $url);
     $url = preg_replace('/([^\/])$/', "$1/", $url);
   }

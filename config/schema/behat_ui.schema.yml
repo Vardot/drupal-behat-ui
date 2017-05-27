@@ -1,0 +1,20 @@
+behat_ui.settings:
+  type: mapping
+  label: Settings
+  mapping:
+    behat_ui_http_user:
+      type: string
+    behat_ui_http_password:
+      type: string
+    behat_ui_http_auth_headless_only:
+      type: integer
+    behat_ui_pidfile:
+      type: string
+    behat_ui_outfile:
+      type: string
+    behat_ui_behat_bin_path:
+      type: string
+    behat_ui_behat_config_path:
+      type: string
+    behat_ui_html_report_dir:
+      type: string

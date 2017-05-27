@@ -1,0 +1,18 @@
+behat_ui:
+  version: VERSION
+  css:
+    theme:
+      css/behat_ui.css: {}
+  js:
+    js/behat_ui.js: {}
+behat_ui_new:
+  version: VERSION
+  js:
+    js/behat_ui_new.js: {}
+modal:
+  version: VERSION
+  css:
+    theme:
+      css/modal.css: {}
+  js:
+    js/jquery.simplemodal.js: {}

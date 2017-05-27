@@ -1,0 +1,5 @@
+behat_ui.settings:
+  route_name: behat_ui.settings
+  title: 'Behat UI'
+  description: 'Automated tests using Behat/Mink'
+  parent: system.admin_config_development

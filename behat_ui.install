@@ -9,10 +9,8 @@
  * Implements hook_install().
  */
 function behat_ui_install() {
-  $t = get_t();
-  drupal_set_message($t("Automated tests using Behat/Mink, Run tests, and create tests under !link",
-    array('!link' => l($t('Administration -> Configuration -> Development -> Behat UI'), 'admin/config/development/behat_ui'))
-  ));
+  $install_message = t("Automated tests using Behat/Mink, Run tests, and create tests under Administration -> Configuration -> Development -> Behat UI");  \Drupal::logger('behat_ui')->notice($install_message);
+  drupal_set_message($install_message, 'warning');
 }
 
 /**
@@ -20,10 +18,7 @@ function behat_ui_install() {
  */
 function behat_ui_uninstall() {
   // Delete variables.
-  variable_del('behat_ui_pidfile');
-  variable_del('behat_ui_outfile');
-  variable_del('behat_ui_html_report_dir');
-
-  // Clear all cache for the bootstrap.
-  cache_clear_all('variables', 'cache_bootstrap');
+  \Drupal::config('behat_ui.settings')->clear('behat_ui_pidfile')->save();
+  \Drupal::config('behat_ui.settings')->clear('behat_ui_outfile')->save();
+  \Drupal::config('behat_ui.settings')->clear('behat_ui_html_report_dir')->save();
 }

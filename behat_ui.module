@@ -1,106 +1,11 @@
 <?php
+
 /**
  * @file
  * Main behat_ui file.
  */
 
 use Behat\Testwork\ServiceContainer\Configuration\ConfigurationLoader;
-
-/**
- * Implements hook_init().
- */
-function behat_ui_init() {
-  // Alerts break tests, so let's replace them by console.log
-  // Clearly this is not the best approach... but the others didn't work! :(
-  // I tried: Behat hooks (beforeStep, afterStep), set cookie on Behat, send
-  // HTTP headers on Behat, etc.
-  // @FIXME
-// The Assets API has totally changed. CSS, JavaScript, and libraries are now
-// attached directly to render arrays using the #attached property.
-//
-//
-// @see https://www.drupal.org/node/2169605
-// @see https://www.drupal.org/node/2408597
-// drupal_add_js('window.alert = function(message) { if (console) console.log(message); }', 'inline');
-
-}
-
-/**
- * Implements hook_menu().
- */
-function behat_ui_menu() {
-  $items = array();
-
-  $items['admin/config/development/behat_ui'] = array(
-    'title' => 'Behat UI',
-    'description' => 'Automated tests using Behat/Mink',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('_behat_ui_settings'),
-    'access arguments' => array('administer site configuration'),
-  );
-
-  $items['admin/config/development/behat_ui/run'] = array(
-    'title' => 'Run tests',
-    'description' => 'Run automated tests',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => 0,
-  );
-
-  $items['admin/config/development/behat_ui/new'] = array(
-    'title' => 'Create test',
-    'description' => 'Create a new automated test',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('_behat_ui_new'),
-    'access arguments' => array('administer site configuration'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 2,
-  );
-
-  $items['behat-ui/status'] = array(
-    'page callback' => '_behat_ui_status',
-    'access arguments' => array('administer site configuration'),
-    'type' => MENU_CALLBACK,
-  );
-
-  $items['behat-ui/autocomplete'] = array(
-    'page callback' => '_behat_ui_autocomplete',
-    'access arguments' => array('administer site configuration'),
-    'type' => MENU_CALLBACK,
-  );
-
-  $items['behat-ui/kill'] = array(
-    'page callback' => '_behat_ui_kill',
-    'access arguments' => array('administer site configuration'),
-    'type' => MENU_CALLBACK,
-  );
-
-  $items['behat-ui/download/%'] = array(
-    'page callback' => '_behat_ui_download',
-    'page arguments' => array(2),
-    'access arguments' => array('administer site configuration'),
-    'type' => MENU_CALLBACK,
-  );
-
-  return $items;
-}
-
-/**
- * Behat Ui autocomplate.
- */
-function _behat_ui_autocomplete($string) {
-  $matches = array();
-
-  $steps = explode('<br />', _behat_ui_steps());
-  foreach ($steps as $step) {
-    $title = preg_replace('/^\s*(Given|Then|When) \/\^/', '', $step);
-    $title = preg_replace('/\$\/$/', '', $title);
-    if (preg_match('/' . preg_quote($string) . '/', $title)) {
-      $matches[$title] = $title;
-    }
-  }
-
-  drupal_json_output($matches);
-}
 
 /**
  * Given a form_state, return a Behat scenario.
@@ -190,9 +95,9 @@ function behat_ui_ajax_add_step($form, $form_state) {
  * Get available steps.
  */
 function _behat_ui_steps() {
-  if ($cache = \Drupal::cache()->get('behat_ui_steps')) {
-    return $cache->data;
-  }
+//  if ($cache = \Drupal::cache()->get('behat_ui_steps')) {
+//    return $cache->data;
+//  }
 
   $behat_bin = _behat_ui_get_behat_bin_path();
   $behat_config_path = _behat_ui_get_behat_config_path();
@@ -201,7 +106,7 @@ function _behat_ui_steps() {
   $cmd = "cd $behat_config_path; $behat_bin -dl | sed 's/^\s*//g' | sort";
   $output = shell_exec($cmd);
   $output = nl2br(htmlentities($output));
-  \Drupal::cache('cache')->set('behat_ui_steps', $output);
+//  \Drupal::cache('cache')->set('behat_ui_steps', $output);
   return $output;
 }
 
@@ -229,62 +134,26 @@ function _behat_ui_features() {
   return $features;
 }
 
-
-
-
 /**
- * Function to get tests status.
+ * Helper function to check if a process with given PID is running or not.
+ *
+ * @param $pid
+ *
+ * @return bool
  */
-function _behat_ui_status() {
-
-  $behat_config_path = _behat_ui_get_behat_config_path();
-
-  $pidfile = \Drupal::config('behat_ui.settings')->get('behat_ui_pidfile');
-  $pid = empty($pidfile) ? 0 : intval(trim(file_get_contents($pidfile)));
-  $outfile = \Drupal::config('behat_ui.settings')->get('behat_ui_outfile');
-  $output = file_get_contents($behat_config_path . '/' . \Drupal::config('behat_ui.settings')->get('behat_ui_html_report_dir') . '/index.html');
-
-  $running = FALSE;
-
-  if ($pid) {
-    try {
-      $result = shell_exec(sprintf("ps %d", $pid));
-      if (count(preg_split("/\n/", $result)) > 2) {
-        $running = TRUE;
-      }
-    }
-    catch (Exception $e) {
-      // Do nothing.
-    }
-
-    if (!$running) {
-      \Drupal::configFactory()->getEditable('behat_ui.settings')->set('behat_ui_pidfile', '')->save();
-      \Drupal::configFactory()->getEditable('behat_ui.settings')->set('behat_ui_outfile', '')->save();
-      \Drupal::configFactory()->getEditable('behat_ui.settings')->set('behat_ui_html_report_dir', '')->save();
-    }
+function behat_ui_process_running($pid) {
+  $isRunning = FALSE;
+//  if(strncasecmp(PHP_OS, "win", 3) == 0) {
+//    $out = [];
+//    exec("TASKLIST /FO LIST /FI \"PID eq $pid\"", $out);
+//    if(count($out) > 1) {
+//      $isRunning = TRUE;
+//    }
+//  }
+  if (posix_kill(intval($pid), 0)) {
+    $isRunning = TRUE;
   }
-
-  drupal_json_output(array('running' => $running, 'output' => $output));
-}
-
-/**
- * Function to kill a process.
- */
-function _behat_ui_kill() {
-  $pidfile = \Drupal::config('behat_ui.settings')->get('behat_ui_pidfile');
-  $pid = empty($pidfile) ? 0 : intval(trim(file_get_contents($pidfile)));
-  $response = FALSE;
-
-  if ($pid) {
-    try {
-      $response = posix_kill($pid, SIGKILL);
-    }
-    catch (Exception $e) {
-      $response = FALSE;
-    }
-  }
-
-  drupal_json_output(array('response' => $response));
+  return $isRunning;
 }
 
 /**
@@ -300,8 +169,10 @@ function load_behat_config() {
 
   $behat_config = array();
 
-  $behat_bin = _behat_ui_get_behat_bin_path();
-  $behat_config_path = _behat_ui_get_behat_config_path();
+  $config = \Drupal::config('behat_ui.settings');
+
+  $behat_bin = $config->get('behat_bin_path');
+  $behat_config_path = $config->get('behat_config_path');
 
   try {
     if (is_file($autoload = $behat_config_path . '/vendor/autoload.php')) {
@@ -328,41 +199,4 @@ function load_behat_config() {
     \Drupal::logger('behat_ui')->notice($watchdog_message, []);
   }
   return ($behat_config);
-}
-
-/**
- * Save output.
- */
-function _behat_ui_download($format) {
-
-  $behat_bin = _behat_ui_get_behat_bin_path();
-  $behat_config_path = _behat_ui_get_behat_config_path();
-
-  if (($format === 'html' || $format === 'txt') && file_exists($output)) {
-
-    $output = \Drupal::config('behat_ui.settings')->get('behat_ui_html_report_dir');
-
-    $headers = array(
-      'Content-Type' => 'text/x-behat',
-      'Content-Disposition' => 'attachment; filename="behat_ui_output.' . $format . '"',
-      'Content-Length' => filesize($output),
-    );
-    foreach ($headers as $key => $value) {
-      drupal_add_http_header($key, $value);
-    }
-    if ($format === 'html') {
-      readfile($output);
-    }
-    elseif ($format === 'txt') {
-      drupal_add_http_header('Connection', 'close');
-
-      $output = \Drupal::config('behat_ui.settings')->get('behat_ui_outfile');
-      $plain = file_get_contents($output);
-      echo drupal_html_to_text($plain);
-    }
-  }
-  else {
-    drupal_set_message(t('Output file not found. Please run the tests again in order to generate it.'), 'error');
-    drupal_goto('admin/config/development/behat_ui');
-  }
 }

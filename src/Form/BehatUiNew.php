@@ -9,7 +9,6 @@ namespace Drupal\behat_ui\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element;
 
 class BehatUiNew extends FormBase {
 
@@ -17,7 +16,7 @@ class BehatUiNew extends FormBase {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'behat_ui_new';
+    return 'behat_ui_new_form';
   }
 
   public function buildForm(array $form, \Drupal\Core\Form\FormStateInterface $form_state) {
@@ -41,7 +40,8 @@ class BehatUiNew extends FormBase {
 
     $form['behat_ui_steps_link'] = [
         '#type' => 'markup',
-        '#markup' => '<p>' . l(t('Check available steps'), '#', ['attributes' => ['id' => 'behat-ui-steps-link']]) . '</p>',
+        //'#markup' => '<p>' . l(t('Check available steps'), '#', ['attributes' => ['id' => 'behat-ui-steps-link']]) . '</p>',
+        '#markup' => '<p>' . t('Check available steps') . '</p>',
       ];
 
 
@@ -192,14 +192,11 @@ class BehatUiNew extends FormBase {
    * Get existing features.
    */
   function behat_ui_features() {
-    $behat_config_path = \Drupal::config('behat_ui.settings')->get('behat_ui_behat_config_path');
     $features_path = 'features';
-
-    // Attempt to load the config with Composer library first.
-    $behat_config = load_behat_config();
+    $config = \Drupal::config('behat_ui.settings');
+    $behat_config_path = $config->get('behat_config_path');
 
     $features = array();
-
     if ($handle = opendir($behat_config_path . '/' . $features_path)) {
       while (FALSE !== ($file = readdir($handle))) {
         if (preg_match('/\.feature$/', $file)) {
@@ -216,18 +213,21 @@ class BehatUiNew extends FormBase {
    * Get available steps.
    */
   function behat_ui_steps() {
-    if ($cache = \Drupal::cache()->get('behat_ui_steps')) {
-      return $cache->data;
-    }
+//    if ($cache = \Drupal::cache()->get('behat_ui_steps')) {
+//      return $cache->data;
+//    }
 
-    $behat_bin = _behat_ui_get_behat_bin_path();
-    $behat_config_path = _behat_ui_get_behat_config_path();
+    $config = \Drupal::config('behat_ui.settings');
+
+    $behat_bin = $config->get('behat_bin_path');
+    $behat_config_path = $config->get('behat_config_path');
 
     global $base_root;
     $cmd = "cd $behat_config_path; $behat_bin -dl | sed 's/^\s*//g' | sort";
     $output = shell_exec($cmd);
     $output = nl2br(htmlentities($output));
-    \Drupal::cache('cache')->set('behat_ui_steps', $output);
+//    \Drupal::cache('cache')->set('behat_ui_steps', $output);
     return $output;
   }
+
 }

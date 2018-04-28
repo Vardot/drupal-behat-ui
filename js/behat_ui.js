@@ -8,7 +8,7 @@
   var killProcess = function() {
     $('#behat-ui-kill').click(function() {
       $.ajax({
-        url: Drupal.settings.basePath + 'behat-ui/kill?' + parseInt(Math.random() * 1000000000, 10),
+        url: drupalSettings.path.baseUrl + 'behat-ui/kill?' + parseInt(Math.random() * 1000000000, 10),
         dataType: 'json',
         success: function (data) {
           if (data.response) {
@@ -32,7 +32,7 @@
         $output = $('#behat-ui-output');
 
     $.ajax({
-      url: Drupal.settings.basePath + 'behat-ui/status?' + parseInt(Math.random() * 1000000000, 10),
+      url: drupalSettings.path.baseUrl + 'behat-ui/status?' + parseInt(Math.random() * 1000000000, 10),
       dataType: 'json',
       success: function (data) {
         $stat.removeClass('running');
@@ -55,7 +55,7 @@
         setTimeout(checkStatus, 10000);
       }
     });
-  }
+  };
 
   checkStatus();
   killProcess();

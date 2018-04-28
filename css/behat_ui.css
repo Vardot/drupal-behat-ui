@@ -2,14 +2,15 @@
   display: block;
   height: 600px;
   overflow: auto;
-  padding: 5px;
-  font-size: 12px;
+  padding: 1em;
+  margin-bottom: 1em;
+  font-size: 14px;
   border: 1px solid #333;
   background: #ffe;
 }
 
 #behat-ui-output * {
-  font-size: 12px;
+  font-size: 14px;
   font-family: sans-serif;
 }
 

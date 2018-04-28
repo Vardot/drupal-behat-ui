@@ -6,6 +6,7 @@
 namespace Drupal\behat_ui\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Default controller for the behat_ui module.
@@ -13,37 +14,23 @@ use Drupal\Core\Controller\ControllerBase;
 class DefaultController extends ControllerBase {
 
   public function _behat_ui_status() {
-
-    $behat_config_path = _behat_ui_get_behat_config_path();
-
-    $pidfile = \Drupal::config('behat_ui.settings')->get('behat_ui_pidfile');
-    $pid = empty($pidfile) ? 0 : intval(trim(file_get_contents($pidfile)));
-    $outfile = \Drupal::config('behat_ui.settings')->get('behat_ui_outfile');
-    $output = file_get_contents($behat_config_path . '/' . \Drupal::config('behat_ui.settings')->get('behat_ui_html_report_dir') . '/index.html');
-
     $running = FALSE;
+    $tempstore = \Drupal::service('user.private_tempstore')->get('behat_ui');
+    $pid = $tempstore->get('behat_ui_pid');
+    $outfile = $tempstore->get('behat_ui_output_log');
+    $reportdir = $tempstore->get('behat_ui_report_dir');
+    $enableHtml = $tempstore->get('behat_ui_enable_html');
 
-    if ($pid) {
-      try {
-        $result = shell_exec(sprintf("ps %d", $pid));
-        if (count(preg_split("/\n/", $result)) > 2) {
-          $running = TRUE;
-        }
-      }
-      
-
-        catch (Exception $e) {
-        // Do nothing.
-      }
-
-      if (!$running) {
-        \Drupal::configFactory()->getEditable('behat_ui.settings')->set('behat_ui_pidfile', '')->save();
-        \Drupal::configFactory()->getEditable('behat_ui.settings')->set('behat_ui_outfile', '')->save();
-        \Drupal::configFactory()->getEditable('behat_ui.settings')->set('behat_ui_html_report_dir', '')->save();
-      }
+    if ($pid && behat_ui_process_running($pid)) {
+      $running = TRUE;
     }
-
-    drupal_json_output(['running' => $running, 'output' => $output]);
+    if ($enableHtml && $reportdir) {
+      $output = file_get_contents($reportdir . '/index.html');
+    }
+    elseif ($outfile && file_exists($outfile)) {
+      $output = nl2br(htmlentities(file_get_contents($outfile)));
+    }
+    return new JsonResponse(['running' => $running, 'output' => $output]);
   }
 
   public function _behat_ui_autocomplete($string) {
@@ -58,25 +45,23 @@ class DefaultController extends ControllerBase {
       }
     }
 
-    drupal_json_output($matches);
+    return new JsonResponse($matches);
   }
 
   public function _behat_ui_kill() {
-    $pidfile = \Drupal::config('behat_ui.settings')->get('behat_ui_pidfile');
-    $pid = empty($pidfile) ? 0 : intval(trim(file_get_contents($pidfile)));
     $response = FALSE;
+    $tempstore = \Drupal::service('user.private_tempstore')->get('behat_ui');
+    $pid = $tempstore->get('behat_ui_pid');
 
     if ($pid) {
       try {
         $response = posix_kill($pid, SIGKILL);
       }
-      
-        catch (Exception $e) {
+      catch (Exception $e) {
         $response = FALSE;
       }
     }
-
-    drupal_json_output(['response' => $response]);
+    return new JsonResponse(['response' => $response]);
   }
 
   public function _behat_ui_download($format) {

@@ -1,5 +1,14 @@
-behat_ui.settings:
+behat_ui.run_tests:
   path: /admin/config/development/behat_ui
+  defaults:
+    _title: 'Behat UI'
+    _form: \Drupal\behat_ui\Form\BehatUiRunTests
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
+behat_ui.settings:
+  path: /admin/config/development/behat_ui/settings
   defaults:
     _title: 'Behat UI'
     _form: \Drupal\behat_ui\Form\BehatUiSettings

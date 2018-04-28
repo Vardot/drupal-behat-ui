@@ -2,10 +2,4 @@ type: module
 name: 'Behat UI'
 description: 'Create and run Behat/Mink tests from the web interface'
 configure: behat_ui.settings
-# core: 8.x
-
-# Information added by Drupal.org packaging script on 2017-07-22
-version: '8.x-1.x-dev'
-core: '8.x'
-project: 'behat_ui'
-datestamp: 1500760445
+core: 8.x

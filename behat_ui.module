@@ -184,7 +184,7 @@ function load_behat_config() {
           'curl -s http://getcomposer.org/installer | php' . PHP_EOL .
           'php composer.phar install' . PHP_EOL;
 
-      drupal_set_message($error_message, 'error');
+      \Drupal::messenger()->addError($error_message);
       \Drupal::logger('behat_ui')->notice($error_message, []);
     }
 
@@ -194,7 +194,7 @@ function load_behat_config() {
 
   }
   catch (ParseException $e) {
-    drupal_set_message(t('Extension yaml is not loaded. Could not parse behat.yml file.'), 'error');
+    \Drupal::messenger()->addError(t('Extension yaml is not loaded. Could not parse behat.yml file.'));
     $watchdog_message = t('Could not parse Behat config file, check Composer libraries, file permissions and Behat config: Error = @error', array('@error' => $e));
     \Drupal::logger('behat_ui')->notice($watchdog_message, []);
   }

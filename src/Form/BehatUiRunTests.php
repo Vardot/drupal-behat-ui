@@ -9,6 +9,7 @@ namespace Drupal\behat_ui\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\File\FileSystemInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
@@ -89,6 +90,7 @@ class BehatUiRunTests extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $tempstore = \Drupal::service('user.private_tempstore')->get('behat_ui');
     $pid = $tempstore->get('behat_ui_pid');
+    $message = \Drupal::messenger();
 
     // Variable $url was never used before.
     //    // HTTP authentication.
@@ -115,8 +117,8 @@ class BehatUiRunTests extends FormBase {
 
       // TODO: Move to BehatUiSettings form.
       $filePath = \Drupal::service('file_system')->realpath(file_default_scheme() . "://") . '/behat_ui';
-      if (!file_prepare_directory($filePath, FILE_CREATE_DIRECTORY)) {
-        drupal_set_message(t('Output directory does not exists or is not writable.'));
+      if (!prepareDirectory($filePath, FILE_CREATE_DIRECTORY)) {
+        $message->addError(t('Output directory does not exists or is not writable.'));
       }
       $fileUserTime = 'user-' . $account->id() . '-' . date('Y-m-d_h-m-s');
 
@@ -131,7 +133,7 @@ class BehatUiRunTests extends FormBase {
       $process = new Process($command);
       $process->enableOutput();
       $process->start();
-      drupal_set_message($process->getExitCodeText());
+      $message->addMessage($process->getExitCodeText());
 
       // TODO: Check why we have to use +1 to get correct PID.
       $tempstore->set('behat_ui_pid', $process->getPid() + 1);
@@ -141,7 +143,7 @@ class BehatUiRunTests extends FormBase {
 
     }
     else {
-      drupal_set_message(t('Tests are already running.'));
+      $message->addMessage(t('Tests are already running.'));
     }
   }
 

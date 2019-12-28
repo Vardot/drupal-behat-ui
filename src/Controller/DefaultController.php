@@ -93,7 +93,7 @@ class DefaultController extends ControllerBase {
       }
     }
     else {
-      drupal_set_message(t('Output file not found. Please run the tests again in order to generate it.'), 'error');
+      \Drupal::messenger()->addError(t('Output file not found. Please run the tests again in order to generate it.'));
       drupal_goto('admin/config/development/behat_ui');
     }
   }

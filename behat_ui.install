@@ -10,7 +10,7 @@
  */
 function behat_ui_install() {
   $install_message = t("Automated tests using Behat/Mink, Run tests, and create tests under Administration -> Configuration -> Development -> Behat UI");  \Drupal::logger('behat_ui')->notice($install_message);
-  drupal_set_message($install_message, 'warning');
+  \Drupal::messenger()->addWarning($install_message);
 }
 
 /**

@@ -1,0 +1,25 @@
+{
+  "name": "drupal/behat_ui",
+  "description": "Create and run Behat/Mink tests from the web interface",
+  "type": "drupal-module",
+  "homepage": "https://www.drupal.org/project/behat_ui",
+  "license": "GPL-2.0-or-later",
+  "minimum-stability": "dev",
+  "authors": [
+    {
+      "name": "Webship",
+      "homepage": "http://webship.org",
+      "role": "Maintainer"
+    }
+  ],
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/behat_ui",
+    "source": "http://cgit.drupalcode.org/behat_ui"
+  },
+  "require": { },
+  "extra": {
+    "branch-alias": {
+      "dev-8.x-1.x": "8.1.x-dev"
+    }
+  }
+}

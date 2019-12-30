@@ -9,6 +9,7 @@ namespace Drupal\behat_ui\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\File\FileSystem;
 use Drupal\Core\File\FileSystemInterface;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -117,7 +118,7 @@ class BehatUiRunTests extends FormBase {
 
       // TODO: Move to BehatUiSettings form.
       $filePath = \Drupal::service('file_system')->realpath(file_default_scheme() . "://") . '/behat_ui';
-      if (!prepareDirectory($filePath, FILE_CREATE_DIRECTORY)) {
+      if (!\Drupal::service('file_system')->prepareDirectory($filePath, FileSystemInterface::CREATE_DIRECTORY)) {
         $message->addError(t('Output directory does not exists or is not writable.'));
       }
       $fileUserTime = 'user-' . $account->id() . '-' . date('Y-m-d_h-m-s');

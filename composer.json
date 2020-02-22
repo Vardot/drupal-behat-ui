@@ -16,10 +16,17 @@
     "issues": "https://www.drupal.org/project/issues/behat_ui",
     "source": "http://cgit.drupalcode.org/behat_ui"
   },
-  "require": { },
+  "require": {
+    "composer/installers": "~1.0",
+    "oomphinc/composer-installers-extender": "~1.0",
+    "cweagans/composer-patches": "~1.0",
+    "drupal/drupal-library-installer-plugin": "^0.3"
+  },
   "extra": {
     "branch-alias": {
-      "dev-8.x-1.x": "8.1.x-dev"
-    }
+      "dev-8.x-3.x": "8.3.x-dev"
+    },
+    "enable-patching": true,
+    "composer-exit-on-patch-failure": true
   }
 }

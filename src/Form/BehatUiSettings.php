@@ -45,7 +45,6 @@ class BehatUiSettings extends ConfigFormBase {
       '#description' => t('No need to include behat.yml on it, neither a trailing slash at the end. Relative paths are relative to Drupal root.'),
       '#type' => 'textfield',
       '#default_value' => $config->get('behat_config_path'),
-      '#required' => TRUE,
     ];
 
     $form['behat_ui_http_user'] = [

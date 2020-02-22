@@ -89,47 +89,32 @@ class BehatUiRunTests extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    global $base_url;
     $tempstore = \Drupal::service('user.private_tempstore')->get('behat_ui');
     $pid = $tempstore->get('behat_ui_pid');
     $message = \Drupal::messenger();
-
-    // Variable $url was never used before.
-    //    // HTTP authentication.
-    //    \Drupal::configFactory()->getEditable('behat_ui.settings')->set('behat_ui_http_user', $form_state->getValue('behat_ui_http_user'))->save();
-    //    if (!empty($form_state->getValue('behat_ui_http_password'))) {
-    //      \Drupal::configFactory()->getEditable('behat_ui.settings')->set('behat_ui_http_password', $form_state->getValue('behat_ui_http_password'))->save();
-    //    }
-    //    \Drupal::configFactory()->getEditable('behat_ui.settings')->set('behat_ui_http_auth_headless_only', $form_state->getValue('behat_ui_http_auth_headless_only'))->save();
-    //    $username = \Drupal::config('behat_ui.settings')->get('behat_ui_http_user');
-    //    $password = \Drupal::config('behat_ui.settings')->get('behat_ui_http_password');
-    //
-    //    $url = $base_root;
-    //    if (!empty($username) && !empty($password) && !\Drupal::config('behat_ui.settings')->get('behat_ui_http_auth_headless_only')) {
-    //      $url = preg_replace('/^(https?:\/\/)/', "$1$username:$password@", $url);
-    //      $url = preg_replace('/([^\/])$/', "$1/", $url);
-    //    }
 
     if (!$pid) {
       $account = \Drupal::currentUser();
       $config = \Drupal::config('behat_ui.settings');
 
       $behat_bin = $config->get('behat_bin_path');
-      $behat_config_path = $config->get('behat_config_path');
+      $behat_config_path = "-c " . $config->get('behat_config_path');
 
       // TODO: Move to BehatUiSettings form.
-      $filePath = \Drupal::service('file_system')->realpath(file_default_scheme() . "://") . '/behat_ui';
+      $filePath = $base_url . '/behat_ui';
       if (!\Drupal::service('file_system')->prepareDirectory($filePath, FileSystemInterface::CREATE_DIRECTORY)) {
         $message->addError(t('Output directory does not exists or is not writable.'));
       }
       $fileUserTime = 'user-' . $account->id() . '-' . date('Y-m-d_h-m-s');
 
       $outfile = $filePath . '/behat-ui-' . $fileUserTime . '.log';
-      $report_dir = $filePath . '/reports/report-' . $fileUserTime;
+      $report_dir = $filePath;
       $enableHtml = $form_state->getValue('behat_ui_enable_html');
 
-      $command = "$behat_bin -c $behat_config_path -f pretty --out std > $outfile&";
+      $command = "$behat_bin $behat_config_path -f pretty --out std > $outfile&";
       if ($enableHtml) {
-        $command = "$behat_bin -c $behat_config_path --format pretty --out std --format html --out $report_dir > $outfile &";
+        $command = "$behat_bin $behat_config_path --format pretty --out std --format html --out > $outfile &";
       }
       $process = new Process($command);
       $process->enableOutput();

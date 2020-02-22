@@ -1,5 +1,4 @@
-Behat UI
-========
+# Behat UI
 
 The Behat UI module lets any person to run automated tests and create new tests
 (and also run them while they are being created).
@@ -57,4 +56,7 @@ Check [this video](http://ca.ios.ba/files/drupal/behatui.ogv) to understand
 
 Check the module on [Drupal.org](https://www.drupal.org/project/behat_ui).
 
-This module was sponsored by [Meedan](http://meedan.org).
+## Sponsored
+* [Meedan](http://meedan.org).
+* [Webship](http://webship.org).
+* [Vardot](http://www.vardot.com).

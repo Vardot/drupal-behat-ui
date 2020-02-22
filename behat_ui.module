@@ -6,23 +6,24 @@
  */
 
 use Behat\Testwork\ServiceContainer\Configuration\ConfigurationLoader;
+use Drupal\Core\Render\Markup;
 
 /**
  * Given a form_state, return a Behat scenario.
  */
 function _behat_ui_generate_scenario($form_state) {
   $scenario = "@api";
-  if ($form_state['values']['behat_ui_javascript']) {
+  if ($form_state['behat_ui_javascript']) {
     $scenario .= " @javascript";
   }
-  $title = $form_state['values']['behat_ui_title'];
+  $title = $form_state['behat_ui_title'];
   $scenario .= "\nScenario: $title\n";
 
   $steps_count = count($form_state['values']['behat_ui_steps']);
 
   for ($i = 0; $i < $steps_count; $i++) {
-    $type = $form_state['values']['behat_ui_steps'][$i]['type'];
-    $step = $form_state['values']['behat_ui_steps'][$i]['step'];
+    $type = $form_state['behat_ui_steps'][$i]['type'];
+    $step = $form_state['behat_ui_steps'][$i]['step'];
 
     if (!empty($type) && !empty($step)) {
       // Blocks.
@@ -52,24 +53,22 @@ function _behat_ui_get_behat_config_path() {
  * Run a single test.
  */
 function _behat_ui_run_single_test($form, &$form_state) {
-  global $user, $base_root;
-
   $behat_bin = _behat_ui_get_behat_bin_path();
-  $behat_config = _behat_ui_get_behat_config_path();
-
+  $behat_config = "-c " . _behat_ui_get_behat_config_path();
+  $formValues = $form_state->getValues();
   // Write to temporary file.
-  $file_user_time = 'user-' . $user->uid . '-' . date('Y-m-d_h-m-s');
+  $file_user_time = 'user-' . date('Y-m-d_h-m-s');
   $file = $behat_config . '/features/tmp/' . $file_user_time . '.feature';
-  $feature = $form_state['values']['behat_ui_feature'];
+  $feature = $formValues['behat_ui_feature'];
   $test = "Feature: $feature\n  In order to test \"$feature\"\n\n";
-  $test .= _behat_ui_generate_scenario($form_state);
+  $test .= _behat_ui_generate_scenario($formValues);
   $handle = fopen($file, 'w+');
   fwrite($handle, $test);
   fclose($handle);
 
   // Run file.
-  $report_dir = $behat_config . '/reports/report-' . $file_user_time;
-  $output = shell_exec("cd $behat_config; $behat_bin $file --format html --out $report_dir");
+  $report_dir = 'behat_ui';
+  $output = shell_exec("$behat_bin $behat_config $file --format html");
 
   $report_html_file_name_and_path = $report_dir . '/index.html';
 
@@ -77,10 +76,14 @@ function _behat_ui_run_single_test($form, &$form_state) {
   $report_html = fread($report_html_handle, filesize($report_html_file_name_and_path));
   fclose($report_html_handle);
 
-  $output .= $report_html;
-
   unlink($file);
-  return '<div id="behat-ui-output-inner">' . $output . '</div>';
+
+  $form['behat_ui_output'] = [
+    '#title' => t('Tests output'),
+    '#type' => 'markup',
+    '#markup' => Markup::create('<div id="behat-ui-output"' . file_get_contents($report_html_file_name_and_path). '</div>'),
+  ];
+  return $form['behat_ui_output'];
 }
 
 /**
@@ -95,9 +98,6 @@ function behat_ui_ajax_add_step($form, $form_state) {
  * Get available steps.
  */
 function _behat_ui_steps() {
-//  if ($cache = \Drupal::cache()->get('behat_ui_steps')) {
-//    return $cache->data;
-//  }
 
   $behat_bin = _behat_ui_get_behat_bin_path();
   $behat_config_path = _behat_ui_get_behat_config_path();
@@ -143,13 +143,6 @@ function _behat_ui_features() {
  */
 function behat_ui_process_running($pid) {
   $isRunning = FALSE;
-//  if(strncasecmp(PHP_OS, "win", 3) == 0) {
-//    $out = [];
-//    exec("TASKLIST /FO LIST /FI \"PID eq $pid\"", $out);
-//    if(count($out) > 1) {
-//      $isRunning = TRUE;
-//    }
-//  }
   if (posix_kill(intval($pid), 0)) {
     $isRunning = TRUE;
   }

@@ -9,6 +9,7 @@ namespace Drupal\behat_ui\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class BehatUiNew extends FormBase {
 
@@ -20,7 +21,6 @@ class BehatUiNew extends FormBase {
   }
 
   public function buildForm(array $form, \Drupal\Core\Form\FormStateInterface $form_state) {
-
     $form['#attached']['library'][] = 'behat_ui/modal';
     $form['#attached']['library'][] = 'behat_ui/behat_ui';
 
@@ -70,7 +70,7 @@ class BehatUiNew extends FormBase {
       '#suffix' => '</div>',
       '#ajax' => [
         'callback' => '_behat_ui_run_single_test',
-        'wrapper' => 'behat-ui-output-inner',
+        'wrapper' => 'behat-ui-output',
       ],
     ];
 
@@ -89,9 +89,10 @@ class BehatUiNew extends FormBase {
       '#prefix' => '<div id="behat-ui-new-steps">',
       '#suffix' => '</div>',
     ];
-
-    if ($form->getStorage()) {
-      for ($i = 0; $i < $form->getStorage(); $i++) {
+    $storage = $form_state->getValues();
+    $stepCount = isset($storage['behat_ui_steps']) ? (count($storage['behat_ui_steps']) + 1) : 1;
+    if ( isset($storage)) {
+      for ($i = 0; $i < $stepCount; $i++) {
         $form['behat_ui_new_scenario']['behat_ui_steps'][$i] = [
           '#type' => 'fieldset',
           '#collapsible' => FALSE,
@@ -139,10 +140,10 @@ class BehatUiNew extends FormBase {
       '#type' => 'radios',
       '#title' => t('Feature'),
       '#options' => $this->behat_ui_features(),
-      '#required' => TRUE,
+      //'#required' => TRUE,
     ];
 
-    $form['behat_ui_scenario_output']['behat_ui_output'] = [
+    $form['behat_ui_output'] = [
       '#title' => t('Tests output'),
       '#type' => 'markup',
       '#markup' => '<div id="behat-ui-output"><div id="behat-ui-output-inner"></div></div>',
@@ -161,31 +162,35 @@ class BehatUiNew extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    global $user, $base_root;
+    $triggerdElement = $form_state->getTriggeringElement();
+    $htmlIdofTriggeredElement = $triggerdElement['#id'];
 
-    $behat_bin = _behat_ui_get_behat_bin_path();
-    $behat_config = _behat_ui_get_behat_config_path();
+    if ($htmlIdofTriggeredElement == 'edit-behat-ui-create') {
+      $behat_bin = _behat_ui_get_behat_bin_path();
+      $behat_config = _behat_ui_get_behat_config_path();
+      $formValues = $form_state->getValues();
 
-    // Write to temporary file.
-    $file_user_time = 'user-' . $user->uid . '-' . date('Y-m-d_h-m-s');
-    $file = $behat_config . '/features/tmp/' . $file_user_time . '.feature';
-    $feature = $form_state['values']['behat_ui_feature'];
-    $scenario = "Feature: $feature\n  In order to test \"$feature\"\n\n";
-    $scenario .= _behat_ui_generate_scenario($form_state);
-    $handle = fopen($file, 'w+');
-    fwrite($handle, $test);
-    fclose($handle);
+      $file =  'features/' . $formValues['behat_ui_feature'] . '.feature';
+      $feature = file_get_contents($file);
+      $scenario = _behat_ui_generate_scenario($formValues);
+      $content = $feature . "\n" . $scenario;
+      $handle = fopen($file, 'w+');
+      fwrite($handle, $content);
+      fclose($handle);
 
-    $file_name = $file_user_time . '.feature';
-    $file_size = filesize($file);
-    // unlink($file);
-    // Send file.
-    $headers = array(
-      'Content-Type' => 'text/x-behat',
-      'Content-Disposition' => 'attachment; filename="' . "$feature.feature" . '"',
-      'Content-Length' => $file_size,
-    );
-    file_transfer('temporary://' . $file, $headers);
+      $file_name =  $formValues['behat_ui_feature'] . '.feature';
+      $file_size = filesize($file);
+      $response = new Response();
+      $response->headers->set('Content-Type', 'text/x-behat');
+      $response->headers->set('Content-Disposition', 'attachment; filename="' . $file_name . '"');
+      $response->headers->set('Pragma', 'no-cache');
+      $response->headers->set('Content-Transfer-Encoding', 'binary');
+      $response->headers->set('Content-Length', filesize($file));
+      $form_state->disableRedirect();
+      readfile($file);
+      return $response->send();
+
+    }
   }
 
   /**
@@ -213,9 +218,6 @@ class BehatUiNew extends FormBase {
    * Get available steps.
    */
   function behat_ui_steps() {
-//    if ($cache = \Drupal::cache()->get('behat_ui_steps')) {
-//      return $cache->data;
-//    }
 
     $config = \Drupal::config('behat_ui.settings');
 

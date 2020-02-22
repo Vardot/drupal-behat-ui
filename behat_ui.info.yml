@@ -1,8 +1,10 @@
 name: 'Behat UI'
-type: module
 description: 'Create and run Behat/Mink tests from the web interface'
-configure: behat_ui.settings
+type: module
 core: 8.x
+version: 8.x-3.x-dev
+configure: behat_ui.settings
 package: Cucumber
 project: behat_ui
+core_version_requirement: ^8 || ^9
 dependencies: []

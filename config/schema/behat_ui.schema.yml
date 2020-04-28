@@ -2,19 +2,45 @@ behat_ui.settings:
   type: mapping
   label: Settings
   mapping:
-    behat_ui_http_user:
-      type: string
-    behat_ui_http_password:
-      type: string
-    behat_ui_http_auth_headless_only:
-      type: integer
-    behat_ui_pidfile:
-      type: string
-    behat_ui_outfile:
-      type: string
     behat_ui_behat_bin_path:
       type: string
+      label: 'Behat binary command path'
     behat_ui_behat_config_path:
       type: string
+      label: 'Behat configuration path'
+    behat_ui_behat_config_file:
+      type: string
+      label: 'Behat configuration file name'
+    behat_ui_behat_tags:
+      type: string
+      label: 'Behat Tags' 
+    behat_ui_autoload_path:
+      type: string
+      label: 'Vendor autoload path'
     behat_ui_html_report_dir:
       type: string
+      label: 'HTML report directory'
+    behat_ui_html_report_file:
+      type: string
+      label: 'HTML report file'
+    behat_ui_logs_report_dir:
+       type: string
+       label: 'Log report directory'
+    behat_ui_logs_report_file:
+      type: string
+      label: 'Log report file'
+    behat_ui_http_user:
+      type: string
+      label: 'HTTP Authentication User'
+    behat_ui_http_password:
+      type: string
+      label: 'HTTP Authentication Password'
+    behat_ui_http_auth_headless_only:
+      type: boolean
+      lable: 'HTTP authentication only'
+    behat_ui_pidfile:
+      type: string
+      label: 'Path to Behat binary'
+    behat_ui_outfile:
+      type: string
+      label: 'Path to Behat binary'

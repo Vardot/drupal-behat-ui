@@ -72,9 +72,32 @@ class BehatUiSettings extends ConfigFormBase {
       '#default_value' => $config->get('behat_ui_behat_config_file'),
     ];
     
+    $form['behat_ui_behat_features_path'] = [
+      '#title' => $this->t('Behat Features path'),
+      '#description' => $this->t('Directory path for featurs to run. No trailing slash at the end<br />
+              <b>for Example:</b>
+              <ul>
+                <li>tests/features</li>
+                <li>tests/features/varbase/step1-init-tests</li>
+                <li>tests/features/varbase/step2-apply-tests</li>
+                <li>tests/features/varbase/step3-cleanup-tests</li>
+              </ul><br />
+              <b>Create a folder in your tests/features/PROJECT_NAMAE</b><br />
+              <p>Add a file could be named all.feature, testing.feature</p> 
+              Then you could use that '),
+      '#type' => 'textfield',
+      '#default_value' => $config->get('behat_ui_behat_features_path'),
+    ];
+    
     $form['behat_ui_autoload_path'] = [
       '#title' => $this->t('Autoload path'),
-      '#description' => $this->t('The path for the autoload file.<br /> for example:<br /> ../../../vendor/autoload.php <br /> ../../../web/autoload.php <br /> ../../../docroot/autoload.php'),
+      '#description' => $this->t('The path for the autoload file.<br />
+        for <b>example:</b><br />
+        <ul>
+          <li>../../../vendor/autoload.php</li>
+          <li>../../../web/autoload.php</li>
+          <li>../../../docroot/autoload.php</li>
+        </ul>'),
       '#type' => 'textfield',
       '#default_value' => $config->get('behat_ui_autoload_path'),
       '#suffix' => '</div></div>',

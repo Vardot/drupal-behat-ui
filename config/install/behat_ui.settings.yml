@@ -1,6 +1,7 @@
 behat_ui_behat_bin_path: 'bin/behat'
 behat_ui_behat_config_path: '.'
 behat_ui_behat_config_file: 'behat.yml'
+behat_ui_behat_features_path: 'tests/features'
 behat_ui_autoload_path: '../../../vendor/autoload.php'
 behat_ui_html_report_dir: 'tests/reports/'
 behat_ui_html_report_file: 'index.html'

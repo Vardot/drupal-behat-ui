@@ -1,0 +1,152 @@
+#behat-ui-output {
+  display: block;
+  height: 600px;
+  overflow: auto;
+  padding: 1em;
+  margin-bottom: 1em;
+  font-size: 14px;
+  border: 1px solid #333;
+  background: #ffe;
+}
+
+#behat-ui-output * {
+  font-size: 14px;
+  font-family: sans-serif;
+}
+
+#behat-ui-output table {
+  width: 90% !important;
+}
+
+#behat-ui-status {
+  font-weight: bold;
+  line-height: 16px;
+}
+
+#behat-ui-status span {
+  color: #a00;
+  padding-left: 18px;
+}
+
+#behat-ui-status.running span {
+  color: green;
+  background: transparent url(loading.gif) left center no-repeat;
+}
+
+#behat .summary {
+  position: static !important;
+}
+
+#behat .summary .switchers {
+  display: none !important;
+}
+
+#behat-ui-steps {
+  display: none;
+}
+
+#behat-ui-steps .form-type-textfield .form-rich,
+#behat-ui-steps .form-type-textfield .form-text.form-rich-processed {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+}
+
+#behat-ui-new-steps .form-type-textfield .form-rich,
+#behat-ui-new-steps .form-type-textfield .form-text.form-rich-processed {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+}
+
+#behat-ui-new-steps .form-type-textfield .form-rich {
+  z-index: 1;
+  background: transparent;
+}
+
+#behat-ui-new-steps .form-type-textfield .form-text.form-rich-processed {
+  color: transparent;
+  background-position: 100% 2px;
+}
+
+#behat-ui-new-steps .form-type-textfield .form-text.form-rich-processed.throbbing {
+  background-position: 100% -18px;
+}
+
+#behat-ui-new-steps .step-param {
+  font-weight: bold;
+  color: #000;
+}
+
+#behat-ui-new-steps .step-no-param {
+  font-weight: normal;
+  color: #666;
+}
+
+#edit-behat-ui-title {
+  width: 98%;
+}
+
+#behat-ui-new-steps .sort-up,
+#behat-ui-new-steps .sort-down,
+#behat-ui-new-steps .remove {
+  position: absolute;
+  display: block;
+  width: 9px;
+  height: 9px;
+  text-indent: -5000em;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+#behat-ui-new-steps .sort-up {
+  left: 3px;
+  top: 11px;
+  background-image: url(../images/up.png);
+}
+
+#behat-ui-new-steps .sort-up:hover {
+  background-image: url(../images/up-hover.png);
+}
+
+#behat-ui-new-steps .sort-down {
+  left: 3px;
+  top: 23px;
+  background-image: url(../images/down.png);
+}
+
+#behat-ui-new-steps .sort-down:hover {
+  background-image: url(../images/down-hover.png);
+}
+
+#behat-ui-new-steps .remove {
+  right: 2px;
+  top: 16px;
+  background-image: url(../images/remove.png);
+}
+
+#behat-ui-new-steps .remove:hover {
+  background-image: url(../images/remove-hover.png);
+}
+
+#behat-ui-new-steps .fieldset__wrapper .form-item .fieldset__wrapper {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+      -ms-flex-wrap: nowrap;
+          flex-wrap: nowrap;
+}

@@ -1,18 +1,16 @@
-behat_ui:
+style:
   version: VERSION
   css:
     theme:
-      css/behat_ui.css: {}
-  js:
-    js/behat_ui.js: {}
-behat_ui_new:
-  version: VERSION
-  js:
-    js/behat_ui_new.js: {}
-modal:
+      css/theme/behat-ui.style.theme.css: {}
+run-tests-scripts:
   version: VERSION
   css:
     theme:
-      css/modal.css: {}
+      css/theme/behat-ui.styling.theme.css: {}
   js:
-    js/jquery.simplemodal.js: {}
+    js/behat-ui.run-tests.js: {}
+new-test-scripts:
+  version: VERSION
+  js:
+    js/behat-ui.new-test.js: {}

@@ -45,66 +45,14 @@
   display: none;
 }
 
-#behat-ui-new-scenario,
-#behat-ui-scenario-output {
-  width: 40%;
-}
-
-#behat-ui-new-scenario {
-  float: left;
-}
-
-#behat-ui-scenario-output {
-  float: right;
-}
-
-#behat-ui-run {
-  display: block;
-  width: 20%;
-  text-align: center;
-  float: left;
-  padding-top: 200px;
-}
-
-#behat-ui-create {
-  clear: both;
-  text-align: center;
-}
-
-#behat-ui-new-steps fieldset fieldset {
+#behat-ui-steps .form-type-textfield .form-rich,
+#behat-ui-steps .form-type-textfield .form-text.form-rich-processed {
+  position: absolute;
+  left: 0;
+  top: 0;
   padding: 0;
-}
-
-#behat-ui-new-steps .form-item {
-  float: left;
-  margin-bottom: 0;
-}
-
-#behat-ui-new-steps .form-type-select {
-  width: 20%;
-}
-
-#behat-ui-new-steps .form-type-textfield {
-  width: 80%;
-}
-
-#behat-ui-new-steps .form-type-select select {
-  width: 90%;
-}
-
-#behat-ui-new-steps .form-type-textfield .form-text {
-  width: 100%;
-}
-
-#behat-ui-new-steps .form-type-textfield .form-rich {
-  width: 93%;
-}
-
-#behat-ui-new-steps .field-rich-wrapper {
-  position: relative;
-  background: #fff;
-  padding: 2px;
-  border: 1px solid #ccc;
+  border: 0;
+  outline: none;
 }
 
 #behat-ui-new-steps .form-type-textfield .form-rich,
@@ -129,11 +77,6 @@
 
 #behat-ui-new-steps .form-type-textfield .form-text.form-rich-processed.throbbing {
   background-position: 100% -18px;
-}
-
-#behat-ui-new-steps .form-type-select select {
-  border: 1px solid #ccc;
-  outline: none;
 }
 
 #behat-ui-new-steps .step-param {
@@ -166,29 +109,44 @@
 #behat-ui-new-steps .sort-up {
   left: 3px;
   top: 11px;
-  background-image: url(up.png);
+  background-image: url(../images/up.png);
 }
 
 #behat-ui-new-steps .sort-up:hover {
-  background-image: url(up-hover.png);
+  background-image: url(../images/up-hover.png);
 }
 
 #behat-ui-new-steps .sort-down {
   left: 3px;
   top: 23px;
-  background-image: url(down.png);
+  background-image: url(../images/down.png);
 }
 
 #behat-ui-new-steps .sort-down:hover {
-  background-image: url(down-hover.png);
+  background-image: url(../images/down-hover.png);
 }
 
 #behat-ui-new-steps .remove {
   right: 2px;
   top: 16px;
-  background-image: url(remove.png);
+  background-image: url(../images/remove.png);
 }
 
 #behat-ui-new-steps .remove:hover {
-  background-image: url(remove-hover.png);
+  background-image: url(../images/remove-hover.png);
+}
+
+#behat-ui-new-steps .fieldset__wrapper .form-item .fieldset__wrapper {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+      -ms-flex-wrap: nowrap;
+          flex-wrap: nowrap;
 }

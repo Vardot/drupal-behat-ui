@@ -78,14 +78,6 @@
     };
   }
 
-  // Display available steps on a modal window.
-  $(window).load(function() {
-    $('#behat-ui-steps-link').click(function() {
-      $('#behat-ui-steps').modal();
-      return false;
-    });
-  });
-
   // Replace step fields by rich text fields.
   var syntaxHighlight = function(text) {
     return text.replace(/((\([^\)]*\))|(( |(&nbsp;))[0-9]+( |(&nbsp;))))/g, '<span class=\'step-param\'>$1</span>')

@@ -13,19 +13,27 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class DefaultController extends ControllerBase {
 
-  public function _behat_ui_status() {
+  public function behatUiStatus() {
     $running = FALSE;
     $tempstore = \Drupal::service('user.private_tempstore')->get('behat_ui');
+    
+    $config = \Drupal::config('behat_ui.settings');
+    $behat_ui_behat_bin_path = $config->get('behat_ui_behat_bin_path');
+    $behat_ui_behat_config_path = $config->get('behat_ui_behat_config_path');
+    
+    $behat_ui_html_report_dir = $config->get('behat_ui_html_report_dir');
+    $behat_ui_html_report_file = $config->get('behat_ui_html_report_file');
+    
+    $behat_ui_http_auth_headless_only = $config->get('behat_ui_http_auth_headless_only');
+    
     $pid = $tempstore->get('behat_ui_pid');
     $outfile = $tempstore->get('behat_ui_output_log');
-    $reportdir = $tempstore->get('behat_ui_report_dir');
-    $enableHtml = $tempstore->get('behat_ui_enable_html');
 
     if ($pid && behat_ui_process_running($pid)) {
       $running = TRUE;
     }
-    if ($enableHtml && $reportdir) {
-      $output = file_get_contents($reportdir . '/index.html');
+    if ($behat_ui_http_auth_headless_only && $behat_ui_html_report_dir) {
+      $output = file_get_contents($behat_ui_html_report_dir . '/' . $behat_ui_html_report_file);
     }
     elseif ($outfile && file_exists($outfile)) {
       $output = nl2br(htmlentities(file_get_contents($outfile)));
@@ -33,12 +41,12 @@ class DefaultController extends ControllerBase {
     return new JsonResponse(['running' => $running, 'output' => $output]);
   }
 
-  public function _behat_ui_autocomplete($string) {
+  public function behatUiAutocomplete($string) {
     $matches = [];
 
-    $steps = explode('<br />', _behat_ui_steps());
+    $steps = explode('<br />', $this->behatUiAutocompleteDefinitionSteps());
     foreach ($steps as $step) {
-      $title = preg_replace('/^\s*(Given|Then|When) \/\^/', '', $step);
+      $title = preg_replace('/^\s*(Given|Then|When|And|But) \/\^/', '', $step);
       $title = preg_replace('/\$\/$/', '', $title);
       if (preg_match('/' . preg_quote($string) . '/', $title)) {
         $matches[$title] = $title;
@@ -48,7 +56,7 @@ class DefaultController extends ControllerBase {
     return new JsonResponse($matches);
   }
 
-  public function _behat_ui_kill() {
+  public function behatUiKill() {
     $response = FALSE;
     $tempstore = \Drupal::service('user.private_tempstore')->get('behat_ui');
     $pid = $tempstore->get('behat_ui_pid');
@@ -64,7 +72,7 @@ class DefaultController extends ControllerBase {
     return new JsonResponse(['response' => $response]);
   }
 
-  public function _behat_ui_download($format) {
+  public function behatUiDownload($format) {
 
     $behat_bin = _behat_ui_get_behat_bin_path();
     $behat_config_path = _behat_ui_get_behat_config_path();
@@ -96,6 +104,85 @@ class DefaultController extends ControllerBase {
       \Drupal::messenger()->addError(t('Output file not found. Please run the tests again in order to generate it.'));
       drupal_goto('admin/config/development/behat_ui');
     }
+  }
+  
+  /**
+   * Behat definition steps.
+   */
+  public function behatUiAutocompleteDefinitionSteps() {
+
+    $config = \Drupal::config('behat_ui.settings');
+    $behat_bin = $config->get('behat_ui_behat_bin_path');
+    $behat_config_path = $config->get('behat_ui_behat_config_path');
+
+    $cmd = "cd $behat_config_path; $behat_bin -dl | sed 's/^\s*//g'";
+    $output = shell_exec($cmd);
+    $output = nl2br(htmlentities($output));
+
+    $build = [
+      '#markup' => $this->formatBehatSteps($output, '', ''),
+    ];
+    return $build;
+  }
+  
+  /**
+   * Behat definition steps.
+   */
+  public function behatUiDefinitionSteps() {
+
+    $config = \Drupal::config('behat_ui.settings');
+    $behat_bin = $config->get('behat_ui_behat_bin_path');
+    $behat_config_path = $config->get('behat_ui_behat_config_path');
+
+    $cmd = "cd $behat_config_path; $behat_bin -dl | sed 's/^\s*//g'";
+    $output = shell_exec($cmd);
+    $output = nl2br(htmlentities($output));
+
+    $build = [
+      '#markup' => $this->formatBehatSteps($output, '<p>', '</p><p class="messages messages--status color-success">'),
+    ];
+    return $build;
+  }
+  
+  /**
+   * Behat definitions steps with extended info.
+   */
+  public function behatUiDefinitionStepsWithInfo() {
+
+    $config = \Drupal::config('behat_ui.settings');
+    $behat_bin = $config->get('behat_ui_behat_bin_path');
+    $behat_config_path = $config->get('behat_ui_behat_config_path');
+
+    $cmd = "cd $behat_config_path; $behat_bin -di";
+    $output = shell_exec($cmd);
+    $output = nl2br(htmlentities($output));
+
+    $build = [
+      '#markup' => $this->formatBehatSteps($output),
+    ];
+    return $build;
+  }
+
+  /**
+   * Format Behat Steps.
+   */
+  public function formatBehatSteps($behatSteps, $formatCodeBeginValue = '<p><code>', $formatCodeEndBeginValue = '</code></p><p class="messages messages--status color-success"><code>') {
+
+    $formatedBehatSteps = str_replace('Given ', '<b>Given</b> ', $behatSteps);
+    $formatedBehatSteps = str_replace('When ', '<b>When</b> ', $formatedBehatSteps);
+    $formatedBehatSteps = str_replace('Then ', '<b>Then</b> ', $formatedBehatSteps);
+    $formatedBehatSteps = str_replace('And ', '<b>And</b> ', $formatedBehatSteps);
+    $formatedBehatSteps = str_replace('But ', '<b>But</b> ', $formatedBehatSteps);
+
+    $formatedBehatSteps = str_replace('Given|', '<b>Given</b>|', $behatSteps);
+    $formatedBehatSteps = str_replace('When|', '<b>When</b>|', $formatedBehatSteps);
+    $formatedBehatSteps = str_replace('Then|', '<b>Then</b>|', $formatedBehatSteps);
+    $formatedBehatSteps = str_replace('And|', '<b>And</b>|', $formatedBehatSteps);
+    $formatedBehatSteps = str_replace('But|', '<b>But</b>|', $formatedBehatSteps);
+
+    $formatedBehatSteps = $formatCodeBeginValue . str_replace('default |',  $formatCodeEndBeginValue, $formatedBehatSteps);
+
+    return $formatedBehatSteps;
   }
 
 }

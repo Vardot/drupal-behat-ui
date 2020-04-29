@@ -11,6 +11,9 @@ behat_ui.settings:
     behat_ui_behat_config_file:
       type: string
       label: 'Behat configuration file name'
+    behat_ui_behat_features_path:
+      type: string
+      label: 'Behat Features path'
     behat_ui_behat_tags:
       type: string
       label: 'Behat Tags' 

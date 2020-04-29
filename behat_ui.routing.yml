@@ -23,27 +23,55 @@ behat_ui.new:
     _form: \Drupal\behat_ui\Form\BehatUiNew
   requirements:
     _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
+behat_ui.behat_dl:
+  path: /admin/config/development/behat_ui/behat_dl
+  defaults:
+    _title: 'Behat definition steps'
+    _controller: '\Drupal\behat_ui\Controller\DefaultController::behatUiDefinitionSteps'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
+behat_ui.behat_di:
+  path: /admin/config/development/behat_ui/behat_di
+  defaults:
+    _title: 'Behat definitions steps with extended info'
+    _controller: '\Drupal\behat_ui\Controller\DefaultController::behatUiDefinitionStepsWithInfo'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
 behat_ui.status:
   path: /behat-ui/status
   defaults:
-    _controller: '\Drupal\behat_ui\Controller\DefaultController::_behat_ui_status'
+    _controller: '\Drupal\behat_ui\Controller\DefaultController::behatUiStatus'
   requirements:
     _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
 behat_ui.autocomplete:
   path: /behat-ui/autocomplete
   defaults:
-    _controller: '\Drupal\behat_ui\Controller\DefaultController::_behat_ui_autocomplete'
+    _controller: '\Drupal\behat_ui\Controller\DefaultController::behatUiAutocomplete'
   requirements:
     _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
 behat_ui.kill:
   path: /behat-ui/kill
   defaults:
-    _controller: '\Drupal\behat_ui\Controller\DefaultController::_behat_ui_kill'
+    _controller: '\Drupal\behat_ui\Controller\DefaultController::behatUiKill'
   requirements:
     _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
 behat_ui.download:
   path: '/behat-ui/download/{format}'
   defaults:
-    _controller: '\Drupal\behat_ui\Controller\DefaultController::_behat_ui_download'
+    _controller: '\Drupal\behat_ui\Controller\DefaultController::behatUiDownload'
   requirements:
     _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE

@@ -4,8 +4,3 @@
  * @file
  * Main behat_ui file.
  */
-
-use Behat\Testwork\ServiceContainer\Configuration\ConfigurationLoader;
-use Drupal\Core\Render\Markup;
-
-

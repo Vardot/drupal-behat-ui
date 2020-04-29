@@ -1,15 +1,13 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\behat_ui\Form\BehatUiSettings.
- */
-
 namespace Drupal\behat_ui\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
+/**
+ *
+ */
 class BehatUiSettings extends ConfigFormBase {
 
   /**
@@ -29,9 +27,9 @@ class BehatUiSettings extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('behat_ui.settings');
-    
+
     $form['behat_ui_behat_bin_path'] = [
       '#title' => $this->t('Behat binary command path'),
       '#description' => $this->t('Absolute or relative to the path below.<br />
@@ -45,10 +43,10 @@ class BehatUiSettings extends ConfigFormBase {
       '#default_value' => $config->get('behat_ui_behat_bin_path'),
       '#required' => TRUE,
       '#prefix' => '<div class="layout-row clearfix">'
-                 . '  <div class="layout-column layout-column--half">'
-                 . '    <div class="panel">'
-                 . '      <h3 class="panel__title">' . $this->t('Behat General Settings') . '</h3>'
-                 . '      <div class="panel__content">',
+      . '  <div class="layout-column layout-column--half">'
+      . '    <div class="panel">'
+      . '      <h3 class="panel__title">' . $this->t('Behat General Settings') . '</h3>'
+      . '      <div class="panel__content">',
     ];
 
     $form['behat_ui_behat_config_path'] = [
@@ -57,7 +55,7 @@ class BehatUiSettings extends ConfigFormBase {
       '#type' => 'textfield',
       '#default_value' => $config->get('behat_ui_behat_config_path'),
     ];
-    
+
     $form['behat_ui_behat_config_file'] = [
       '#title' => $this->t('Behat configuration file name'),
       '#description' => $this->t('behat.yml other names like behat-install.yml, which located in the Behat configuration path.<br />
@@ -71,7 +69,7 @@ class BehatUiSettings extends ConfigFormBase {
       '#type' => 'textfield',
       '#default_value' => $config->get('behat_ui_behat_config_file'),
     ];
-    
+
     $form['behat_ui_behat_features_path'] = [
       '#title' => $this->t('Behat Features path'),
       '#description' => $this->t('Directory path for featurs to run. No trailing slash at the end<br />
@@ -88,7 +86,7 @@ class BehatUiSettings extends ConfigFormBase {
       '#type' => 'textfield',
       '#default_value' => $config->get('behat_ui_behat_features_path'),
     ];
-    
+
     $form['behat_ui_autoload_path'] = [
       '#title' => $this->t('Autoload path'),
       '#description' => $this->t('The path for the autoload file.<br />
@@ -109,8 +107,8 @@ class BehatUiSettings extends ConfigFormBase {
       '#type' => 'textfield',
       '#default_value' => $config->get('behat_ui_html_report_dir'),
       '#prefix' => '<div class="panel">'
-                 . '  <h3 class="panel__title">' . $this->t('HTML Formated Report') . '</h3>'
-                 . '  <div class="panel__content">',
+      . '  <h3 class="panel__title">' . $this->t('HTML Formated Report') . '</h3>'
+      . '  <div class="panel__content">',
     ];
 
     $form['behat_ui_html_report_file'] = [
@@ -120,16 +118,15 @@ class BehatUiSettings extends ConfigFormBase {
       '#default_value' => $config->get('behat_ui_html_report_file'),
       '#suffix' => '</div></div>',
     ];
-    
-    
+
     $form['behat_ui_log_report_dir'] = [
       '#title' => $this->t('Log report directory'),
       '#description' => $this->t('Add the full phiscial path for the tests/logs . No trailing slash at the end'),
       '#type' => 'textfield',
       '#default_value' => $config->get('behat_ui_log_report_dir'),
       '#prefix' => '<div class="panel">'
-                 . '  <h3 class="panel__title">' . $this->t('Log Report') . '</h3>'
-                 . '  <div class="panel__content">',
+      . '  <h3 class="panel__title">' . $this->t('Log Report') . '</h3>'
+      . '  <div class="panel__content">',
     ];
 
     $form['behat_ui_log_report_file'] = [
@@ -139,16 +136,16 @@ class BehatUiSettings extends ConfigFormBase {
       '#default_value' => $config->get('behat_ui_log_report_file'),
       '#suffix' => '</div></div></div>',
     ];
-    
+
     $form['behat_ui_http_user'] = [
       '#title' => $this->t('HTTP Authentication User'),
       '#description' => $this->t('User name for the basic authentication for the targeted site.'),
       '#type' => 'textfield',
       '#default_value' => $config->get('behat_ui_http_user'),
       '#prefix' => '<div class="layout-column layout-column--half">'
-                 . '  <div class="panel">'
-                 . '    <h3 class="panel__title">' . $this->t('HTTP Authentication') . '</h3>'
-                 . '    <div class="panel__content">',
+      . '  <div class="panel">'
+      . '    <h3 class="panel__title">' . $this->t('HTTP Authentication') . '</h3>'
+      . '    <div class="panel__content">',
     ];
 
     $form['behat_ui_http_password'] = [
@@ -165,7 +162,7 @@ class BehatUiSettings extends ConfigFormBase {
       '#description' => $this->t('Sometimes testing using Selenium (or other driver that allows JavaScript) does not handle HTTP authentication well, for example when you have some link with some JavaScript behavior attached. On these cases, you may enable this HTTP authentication only for headless testing and find another solution for drivers that allow JavaScript (for example, with Selenium + JavaScript you can use the extension Auto Auth and save the credentials on a Firefox profile).'),
       '#suffix' => '</div></div>',
     ];
-    
+
     $form['behat_ui_behat_tags'] = [
       '#type' => 'textarea',
       '#title' => $this->t('List of aviabled behat tags to pass to the Run tests to limit scenarios.'),
@@ -196,11 +193,11 @@ class BehatUiSettings extends ConfigFormBase {
         </ul>
        '),
       '#prefix' => '<div class="panel">'
-                 . '  <h3 class="panel__title">' . $this->t('Behat Tags') . '</h3>'
-                 . '  <div class="panel__content">',
+      . '  <h3 class="panel__title">' . $this->t('Behat Tags') . '</h3>'
+      . '  <div class="panel__content">',
       '#suffix' => '</div></div></div></div>',
     ];
-    
+
     return parent::buildForm($form, $form_state);
   }
 

@@ -1,7 +1,4 @@
-<?php /**
- * @file
- * Contains \Drupal\behat_ui\Controller\DefaultController.
- */
+<?php
 
 namespace Drupal\behat_ui\Controller;
 
@@ -13,19 +10,22 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class DefaultController extends ControllerBase {
 
+  /**
+   *
+   */
   public function behatUiStatus() {
     $running = FALSE;
     $tempstore = \Drupal::service('user.private_tempstore')->get('behat_ui');
-    
+
     $config = \Drupal::config('behat_ui.settings');
     $behat_ui_behat_bin_path = $config->get('behat_ui_behat_bin_path');
     $behat_ui_behat_config_path = $config->get('behat_ui_behat_config_path');
-    
+
     $behat_ui_html_report_dir = $config->get('behat_ui_html_report_dir');
     $behat_ui_html_report_file = $config->get('behat_ui_html_report_file');
-    
+
     $behat_ui_http_auth_headless_only = $config->get('behat_ui_http_auth_headless_only');
-    
+
     $pid = $tempstore->get('behat_ui_pid');
     $outfile = $tempstore->get('behat_ui_output_log');
 
@@ -41,6 +41,9 @@ class DefaultController extends ControllerBase {
     return new JsonResponse(['running' => $running, 'output' => $output]);
   }
 
+  /**
+   *
+   */
   public function behatUiAutocomplete($string) {
     $matches = [];
 
@@ -56,6 +59,9 @@ class DefaultController extends ControllerBase {
     return new JsonResponse($matches);
   }
 
+  /**
+   *
+   */
   public function behatUiKill() {
     $response = FALSE;
     $tempstore = \Drupal::service('user.private_tempstore')->get('behat_ui');
@@ -72,6 +78,9 @@ class DefaultController extends ControllerBase {
     return new JsonResponse(['response' => $response]);
   }
 
+  /**
+   *
+   */
   public function behatUiDownload($format) {
 
     $behat_bin = _behat_ui_get_behat_bin_path();
@@ -105,7 +114,7 @@ class DefaultController extends ControllerBase {
       drupal_goto('admin/config/development/behat_ui');
     }
   }
-  
+
   /**
    * Behat definition steps.
    */
@@ -124,7 +133,7 @@ class DefaultController extends ControllerBase {
     ];
     return $build;
   }
-  
+
   /**
    * Behat definition steps.
    */
@@ -143,7 +152,7 @@ class DefaultController extends ControllerBase {
     ];
     return $build;
   }
-  
+
   /**
    * Behat definitions steps with extended info.
    */
@@ -180,7 +189,7 @@ class DefaultController extends ControllerBase {
     $formatedBehatSteps = str_replace('And|', '<b>And</b>|', $formatedBehatSteps);
     $formatedBehatSteps = str_replace('But|', '<b>But</b>|', $formatedBehatSteps);
 
-    $formatedBehatSteps = $formatCodeBeginValue . str_replace('default |',  $formatCodeEndBeginValue, $formatedBehatSteps);
+    $formatedBehatSteps = $formatCodeBeginValue . str_replace('default |', $formatCodeEndBeginValue, $formatedBehatSteps);
 
     return $formatedBehatSteps;
   }

@@ -9,20 +9,20 @@
  * Implements hook_drush_command().
  */
 function behat_ui_drush_command() {
-  $items = array();
+  $items = [];
 
   // The 'behat-ui' command.
-  $items['behat-ui'] = array(
+  $items['behat-ui'] = [
     'description' => "Runs your Behat testing suite.",
-    'arguments' => array(),
-    'options' => array(),
-    'examples' => array(
+    'arguments' => [],
+    'options' => [],
+    'examples' => [
       'drush bui' => 'Runs the testing suite.',
-    ),
-    'aliases' => array('bui'),
-  // No bootstrap at all.
+    ],
+    'aliases' => ['bui'],
+    // No bootstrap at all.
     'bootstrap' => DRUSH_BOOTSTRAP_DRUSH,
-  );
+  ];
 
   return $items;
 }

@@ -100,15 +100,16 @@ class BehatUiRunTests extends FormBase {
 
     $behat_ui_http_auth_headless_only = $config->get('behat_ui_http_auth_headless_only');
 
-    $pid = $config->get('behat_ui_pidfile');
-    $outfile = $config->get('behat_ui_outfile');
+    $tempstore = \Drupal::service('user.private_tempstore')->get('behat_ui');
+
+    $pid = $tempstore->get('behat_ui_pid');
 
     $message = \Drupal::messenger();
 
-    if (!$pid) {
+    if (isset($pid) && $pid = 'behat_ui_process_id_running') {
       $config = \Drupal::config('behat_ui.settings');
 
-      $behat_config_path = "-c " . $config->get('behat_config_path');
+      $behat_config_path = "-c " . $behat_ui_behat_config_path;
 
       $filePath = $behat_ui_log_report_dir . '/' . $behat_ui_log_report_file;
       if (!\Drupal::service('file_system')->prepareDirectory($filePath, FileSystemInterface::CREATE_DIRECTORY)) {
@@ -126,6 +127,8 @@ class BehatUiRunTests extends FormBase {
       $process->enableOutput();
       $process->start();
       $message->addMessage($process->getExitCodeText());
+
+      $tempstore->set('behat_ui_pid', 'behat_ui_process_id_running');
     }
     else {
       $message->addMessage($this->t('Tests are already running.'));

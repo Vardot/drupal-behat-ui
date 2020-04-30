@@ -6,6 +6,8 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Url;
+use Drupal\behat_ui\Controller\BehatUiController;
 
 /**
  *
@@ -26,7 +28,11 @@ class BehatUiNew extends FormBase {
     $form['#attached']['library'][] = 'behat_ui/style';
     $form['#attached']['library'][] = 'behat_ui/new-test-scripts';
 
-    $origin_url = \Drupal::request()->getSchemeAndHttpHost() . \Drupal::request()->getBaseUrl();
+    $behatUiController = new BehatUiController();
+    $form['behat_ui_steps']['behat_ui_steps_content'] = [
+      '#type' => 'markup',
+      '#markup' => $behatUiController->getAutocompleteDefinitionSteps(),
+    ];
 
     $form['behat_ui_new_scenario'] = [
       '#type' => 'markup',
@@ -37,22 +43,24 @@ class BehatUiNew extends FormBase {
       . '      <div class="panel__content">',
     ];
 
+    $behat_ui_steps_link = new Url('behat_ui.behat_dl');
     $form['behat_ui_new_scenario']['behat_ui_steps_link'] = [
       '#type' => 'markup',
       '#markup' => '<a class="button use-ajax"
-            data-dialog-options="{&quot;width&quot;:400}" 
+            data-dialog-options="{&quot;width&quot;:500}" 
             data-dialog-renderer="off_canvas" 
             data-dialog-type="dialog"
-            href="' . $origin_url . '/admin/config/development/behat_ui/behat_dl" >' . $this->t('Check available steps') . '</a>',
+            href="' . \Drupal::request()->getSchemeAndHttpHost() . $behat_ui_steps_link->toString() . '" >' . $this->t('Check available steps') . '</a>',
     ];
 
+    $behat_ui_steps_link_with_info = new Url('behat_ui.behat_di');
     $form['behat_ui_new_scenario']['behat_ui_steps_link_with_info'] = [
       '#type' => 'markup',
       '#markup' => '<a class="button use-ajax"
-            data-dialog-options="{&quot;width&quot;:400}" 
+            data-dialog-options="{&quot;width&quot;:500}" 
             data-dialog-renderer="off_canvas" 
             data-dialog-type="dialog"
-            href="' . $origin_url . '/admin/config/development/behat_ui/behat_di" >' . $this->t('Full steps with info') . '</a>',
+            href="' . \Drupal::request()->getSchemeAndHttpHost() . $behat_ui_steps_link_with_info->toString() . '" >' . $this->t('Full steps with info') . '</a>',
     ];
 
     $form['behat_ui_new_scenario']['behat_ui_title'] = [

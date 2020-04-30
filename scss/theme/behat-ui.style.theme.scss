@@ -30,7 +30,7 @@
   &.running {
     span {
       color: green;
-      background: transparent url(loading.gif) left center no-repeat;
+      background: transparent url(../../images/loading.gif) left center no-repeat;
     }
   }
 }
@@ -90,67 +90,67 @@
       }
     }
   }
-}
+  
+  .step-param {
+    font-weight: bold;
+    color: #000;
+  }
+  
+  .step-no-param {
+    font-weight: normal;
+    color: #666;
+  }
+  
+  .sort-up,
+  .sort-down,
+  .remove {
+    position: absolute;
+    display: block;
+    width: 9px;
+    height: 9px;
+    text-indent: -5000em;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center center;
+  }
 
-#behat-ui-new-steps .step-param {
-  font-weight: bold;
-  color: #000;
-}
+  .sort-up {
+    left: 3px;
+    top: 11px;
+    background-image: url(../../images/up.png);
+  }
 
-#behat-ui-new-steps .step-no-param {
-  font-weight: normal;
-  color: #666;
-}
+  .sort-up:hover {
+    background-image: url(../../images/up-hover.png);
+  }
 
-#edit-behat-ui-title {
-  width: 98%;
-}
+  .sort-down {
+    left: 3px;
+    top: 23px;
+    background-image: url(../../images/down.png);
+  }
 
-#behat-ui-new-steps .sort-up,
-#behat-ui-new-steps .sort-down,
-#behat-ui-new-steps .remove {
-  position: absolute;
-  display: block;
-  width: 9px;
-  height: 9px;
-  text-indent: -5000em;
-  background-color: transparent;
-  background-repeat: no-repeat;
-  background-position: center center;
-}
+  .sort-down:hover {
+    background-image: url(../../images/down-hover.png);
+  }
 
-#behat-ui-new-steps .sort-up {
-  left: 3px;
-  top: 11px;
-  background-image: url(../images/up.png);
-}
+  .remove {
+    right: 2px;
+    top: 16px;
+    background-image: url(../../images/remove.png);
+  }
 
-#behat-ui-new-steps .sort-up:hover {
-  background-image: url(../images/up-hover.png);
-}
+  .remove:hover {
+    background-image: url(../../images/remove-hover.png);
+  }
 
-#behat-ui-new-steps .sort-down {
-  left: 3px;
-  top: 23px;
-  background-image: url(../images/down.png);
-}
-
-#behat-ui-new-steps .sort-down:hover {
-  background-image: url(../images/down-hover.png);
-}
-
-#behat-ui-new-steps .remove {
-  right: 2px;
-  top: 16px;
-  background-image: url(../images/remove.png);
-}
-
-#behat-ui-new-steps .remove:hover {
-  background-image: url(../images/remove-hover.png);
-}
-
-#behat-ui-new-steps .fieldset__wrapper .form-item .fieldset__wrapper {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
+  .fieldset__wrapper {
+    .form-item {
+     .fieldset__wrapper {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+      }
+    }
+  } 
 }

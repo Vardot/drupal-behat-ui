@@ -1,5 +1,5 @@
 behat_ui.run_tests:
-  path: /admin/config/development/behat_ui
+  path: /admin/config/development/behat-ui
   defaults:
     _title: 'Behat UI'
     _form: \Drupal\behat_ui\Form\BehatUiRunTests
@@ -8,7 +8,7 @@ behat_ui.run_tests:
   options:
     _admin_route: TRUE
 behat_ui.settings:
-  path: /admin/config/development/behat_ui/settings
+  path: /admin/config/development/behat-ui/settings
   defaults:
     _title: 'Behat UI'
     _form: \Drupal\behat_ui\Form\BehatUiSettings
@@ -17,7 +17,7 @@ behat_ui.settings:
   options:
     _admin_route: TRUE
 behat_ui.new:
-  path: /admin/config/development/behat_ui/new
+  path: /admin/config/development/behat-ui/new
   defaults:
     _title: 'Create test'
     _form: \Drupal\behat_ui\Form\BehatUiNew
@@ -26,19 +26,19 @@ behat_ui.new:
   options:
     _admin_route: TRUE
 behat_ui.behat_dl:
-  path: /admin/config/development/behat_ui/behat_dl
+  path: /admin/config/development/behat-ui/behat-dl
   defaults:
     _title: 'Behat definition steps'
-    _controller: '\Drupal\behat_ui\Controller\DefaultController::behatUiDefinitionSteps'
+    _controller: '\Drupal\behat_ui\Controller\BehatUiController::getDefinitionSteps'
   requirements:
     _permission: 'administer site configuration'
   options:
     _admin_route: TRUE
 behat_ui.behat_di:
-  path: /admin/config/development/behat_ui/behat_di
+  path: /admin/config/development/behat-ui/behat-di
   defaults:
     _title: 'Behat definitions steps with extended info'
-    _controller: '\Drupal\behat_ui\Controller\DefaultController::behatUiDefinitionStepsWithInfo'
+    _controller: '\Drupal\behat_ui\Controller\BehatUiController::getDefinitionStepsWithInfo'
   requirements:
     _permission: 'administer site configuration'
   options:
@@ -46,7 +46,7 @@ behat_ui.behat_di:
 behat_ui.status:
   path: /behat-ui/status
   defaults:
-    _controller: '\Drupal\behat_ui\Controller\DefaultController::behatUiStatus'
+    _controller: '\Drupal\behat_ui\Controller\BehatUiController::getTestStatus'
   requirements:
     _permission: 'administer site configuration'
   options:
@@ -54,7 +54,7 @@ behat_ui.status:
 behat_ui.autocomplete:
   path: /behat-ui/autocomplete
   defaults:
-    _controller: '\Drupal\behat_ui\Controller\DefaultController::behatUiAutocomplete'
+    _controller: '\Drupal\behat_ui\Controller\BehatUiController::autocomplete'
   requirements:
     _permission: 'administer site configuration'
   options:
@@ -62,7 +62,7 @@ behat_ui.autocomplete:
 behat_ui.kill:
   path: /behat-ui/kill
   defaults:
-    _controller: '\Drupal\behat_ui\Controller\DefaultController::behatUiKill'
+    _controller: '\Drupal\behat_ui\Controller\BehatUiController::kill'
   requirements:
     _permission: 'administer site configuration'
   options:
@@ -70,7 +70,7 @@ behat_ui.kill:
 behat_ui.download:
   path: '/behat-ui/download/{format}'
   defaults:
-    _controller: '\Drupal\behat_ui\Controller\DefaultController::behatUiDownload'
+    _controller: '\Drupal\behat_ui\Controller\BehatUiController::download'
   requirements:
     _permission: 'administer site configuration'
   options:

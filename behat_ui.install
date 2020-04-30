@@ -12,13 +12,3 @@ function behat_ui_install() {
   $install_message = t("Automated tests using Behat/Mink, Run tests, and create tests under Administration -> Configuration -> Development -> Behat UI");  \Drupal::logger('behat_ui')->notice($install_message);
   \Drupal::messenger()->addWarning($install_message);
 }
-
-/**
- * Implements hook_uninstall().
- */
-function behat_ui_uninstall() {
-  // Delete variables.
-  \Drupal::config('behat_ui.settings')->clear('behat_ui_pidfile')->save();
-  \Drupal::config('behat_ui.settings')->clear('behat_ui_outfile')->save();
-  \Drupal::config('behat_ui.settings')->clear('behat_ui_html_report_dir')->save();
-}

@@ -6,17 +6,15 @@ use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
- * Default controller for the behat_ui module.
+ * Default Behat Ui controller for the Behat Ui module.
  */
-class DefaultController extends ControllerBase {
+class BehatUiController extends ControllerBase {
 
   /**
-   *
+   * Get Behat test status.
    */
-  public function behatUiStatus() {
+  public function getTestStatus() {
     $running = FALSE;
-    $tempstore = \Drupal::service('user.private_tempstore')->get('behat_ui');
-
     $config = \Drupal::config('behat_ui.settings');
     $behat_ui_behat_bin_path = $config->get('behat_ui_behat_bin_path');
     $behat_ui_behat_config_path = $config->get('behat_ui_behat_config_path');
@@ -26,10 +24,10 @@ class DefaultController extends ControllerBase {
 
     $behat_ui_http_auth_headless_only = $config->get('behat_ui_http_auth_headless_only');
 
+    $tempstore = \Drupal::service('user.private_tempstore')->get('behat_ui');
     $pid = $tempstore->get('behat_ui_pid');
-    $outfile = $tempstore->get('behat_ui_output_log');
 
-    if ($pid && behat_ui_process_running($pid)) {
+    if (isset($pid) && $this->processRunning($pid)) {
       $running = TRUE;
     }
     if ($behat_ui_http_auth_headless_only && $behat_ui_html_report_dir) {
@@ -42,12 +40,12 @@ class DefaultController extends ControllerBase {
   }
 
   /**
-   *
+   * Auto complete.
    */
-  public function behatUiAutocomplete($string) {
+  public function autocomplete($string) {
     $matches = [];
 
-    $steps = explode('<br />', $this->behatUiAutocompleteDefinitionSteps());
+    $steps = explode('<br />', $this->autocompleteDefinitionSteps());
     foreach ($steps as $step) {
       $title = preg_replace('/^\s*(Given|Then|When|And|But) \/\^/', '', $step);
       $title = preg_replace('/\$\/$/', '', $title);
@@ -60,9 +58,9 @@ class DefaultController extends ControllerBase {
   }
 
   /**
-   *
+   * Kill running test.
    */
-  public function behatUiKill() {
+  public function kill() {
     $response = FALSE;
     $tempstore = \Drupal::service('user.private_tempstore')->get('behat_ui');
     $pid = $tempstore->get('behat_ui_pid');
@@ -79,16 +77,13 @@ class DefaultController extends ControllerBase {
   }
 
   /**
-   *
+   * Download.
    */
-  public function behatUiDownload($format) {
+  public function download($format) {
 
-    $behat_bin = _behat_ui_get_behat_bin_path();
-    $behat_config_path = _behat_ui_get_behat_config_path();
+    $config = \Drupal::config('behat_ui.settings');
 
-    if (($format === 'html' || $format === 'txt') && file_exists($output)) {
-
-      $output = \Drupal::config('behat_ui.settings')->get('behat_ui_html_report_dir');
+    if (($format === 'html' || $format === 'txt')) {
 
       $headers = [
         'Content-Type' => 'text/x-behat',
@@ -99,26 +94,33 @@ class DefaultController extends ControllerBase {
         drupal_add_http_header($key, $value);
       }
       if ($format === 'html') {
+
+        $behat_ui_html_report_dir = $config->get('behat_ui_html_report_dir');
+        $behat_ui_html_report_file = $config->get('behat_ui_html_report_file');
+        $output = $behat_ui_html_report_dir . '/' . $behat_ui_html_report_file;
         readfile($output);
       }
       elseif ($format === 'txt') {
         drupal_add_http_header('Connection', 'close');
 
-        $output = \Drupal::config('behat_ui.settings')->get('behat_ui_outfile');
+        $behat_ui_log_report_dir = $config->get('behat_ui_log_report_dir');
+        $behat_ui_log_report_file = $config->get('behat_ui_log_report_file');
+
+        $output = $behat_ui_log_report_dir . '/' . $behat_ui_log_report_file;
         $plain = file_get_contents($output);
         echo drupal_html_to_text($plain);
       }
     }
     else {
-      \Drupal::messenger()->addError(t('Output file not found. Please run the tests again in order to generate it.'));
-      drupal_goto('admin/config/development/behat_ui');
+      \Drupal::messenger()->addError($this->t('Output file not found. Please run the tests again in order to generate it.'));
+      drupal_goto('behat_ui.run_tests');
     }
   }
 
   /**
-   * Behat definition steps.
+   * Auto complete behat definition steps.
    */
-  public function behatUiAutocompleteDefinitionSteps() {
+  public function getAutocompleteDefinitionSteps() {
 
     $config = \Drupal::config('behat_ui.settings');
     $behat_bin = $config->get('behat_ui_behat_bin_path');
@@ -137,7 +139,7 @@ class DefaultController extends ControllerBase {
   /**
    * Behat definition steps.
    */
-  public function behatUiDefinitionSteps() {
+  public function getDefinitionSteps() {
 
     $config = \Drupal::config('behat_ui.settings');
     $behat_bin = $config->get('behat_ui_behat_bin_path');
@@ -156,7 +158,7 @@ class DefaultController extends ControllerBase {
   /**
    * Behat definitions steps with extended info.
    */
-  public function behatUiDefinitionStepsWithInfo() {
+  public function getDefinitionStepsWithInfo() {
 
     $config = \Drupal::config('behat_ui.settings');
     $behat_bin = $config->get('behat_ui_behat_bin_path');
@@ -192,6 +194,21 @@ class DefaultController extends ControllerBase {
     $formatedBehatSteps = $formatCodeBeginValue . str_replace('default |', $formatCodeEndBeginValue, $formatedBehatSteps);
 
     return $formatedBehatSteps;
+  }
+
+  /**
+   * Helper function to check if a process with given PID is running or not.
+   *
+   * @param $pid
+   *
+   * @return bool
+   */
+  public function processRunning($pid) {
+    $isRunning = FALSE;
+    if (posix_kill(intval($pid), 0)) {
+      $isRunning = TRUE;
+    }
+    return $isRunning;
   }
 
 }

@@ -5,9 +5,6 @@ style:
       css/theme/behat-ui.style.theme.css: {}
 run-tests-scripts:
   version: VERSION
-  css:
-    theme:
-      css/theme/behat-ui.styling.theme.css: {}
   js:
     js/behat-ui.run-tests.js: {}
 new-test-scripts:

@@ -7,7 +7,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
-use Drupal\behat_ui\Controller\BehatUiController;
 
 /**
  *
@@ -22,17 +21,11 @@ class BehatUiNew extends FormBase {
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['#attached']['library'][] = 'behat_ui/style';
     $form['#attached']['library'][] = 'behat_ui/new-test-scripts';
-
-    $behatUiController = new BehatUiController();
-    $form['behat_ui_steps']['behat_ui_steps_content'] = [
-      '#type' => 'markup',
-      '#markup' => $behatUiController->getAutocompleteDefinitionSteps(),
-    ];
 
     $form['behat_ui_new_scenario'] = [
       '#type' => 'markup',
@@ -104,7 +97,7 @@ class BehatUiNew extends FormBase {
 
         $form['behat_ui_new_scenario']['behat_ui_steps'][$i]['step'] = [
           '#type' => 'textfield',
-          '#autocomplete_path' => 'behat-ui/autocomplete',
+          '#autocomplete_route_name' => 'behat_ui.autocomplete',
         ];
       }
     }
@@ -134,6 +127,7 @@ class BehatUiNew extends FormBase {
     ];
 
     $form['behat_ui_scenario_output'] = [
+      '#type' => 'markup',
       '#markup' => '<div class="layout-column layout-column--half">'
       . '    <div class="panel">'
       . '      <h3 class="panel__title">' . $this->t('Scenario output') . '</h3>'
@@ -141,12 +135,10 @@ class BehatUiNew extends FormBase {
     ];
 
     $form['behat_ui_run'] = [
-      '#type' => 'button',
+      '#type' => 'submit',
       '#value' => $this->t('Run >>'),
       '#ajax' => [
         'callback' => '::runSingleTest',
-    // Or TRUE to prevent re-focusing on the triggering element.
-        'disable-refocus' => FALSE,
         'event' => 'click',
         'wrapper' => 'behat-ui-output',
         'progress' => [
@@ -161,7 +153,7 @@ class BehatUiNew extends FormBase {
       '#value' => $this->t('Download updated feature'),
       '#attribute' => [
         'id' => 'behat-ui-create',
-        'classes' => 'button right',
+        'classes' => ['button'],
       ],
     ];
 
@@ -242,23 +234,29 @@ class BehatUiNew extends FormBase {
     $config = \Drupal::config('behat_ui.settings');
     $behat_ui_behat_bin_path = $config->get('behat_ui_behat_bin_path');
     $behat_ui_behat_config_path = $config->get('behat_ui_behat_config_path');
+    $behat_ui_behat_config_file = $config->get('behat_ui_behat_config_file');
+    $behat_ui_behat_features_path = $config->get('behat_ui_behat_features_path');
+
     $behat_ui_html_report_dir = $config->get('behat_ui_html_report_dir');
     $behat_ui_html_report_file = $config->get('behat_ui_html_report_file');
 
-    $behat_config = "-c " . $behat_ui_behat_config_path;
+    $behat_ui_save_user_testing_features = $config->get('behat_ui_save_user_testing_features');
+
     $formValues = $form_state->getValues();
     // Write to temporary file.
     $file_user_time = 'user-' . date('Y-m-d_h-m-s');
-    $file = $behat_config . '/features/tmp/' . $file_user_time . '.feature';
-    $feature = $formValues['behat_ui_feature'];
-    $test = "Feature: $feature\n  In order to test \"$feature\"\n\n";
+    $file = $behat_ui_behat_config_path . '/' . $behat_ui_behat_features_path . '/' . $file_user_time . '.feature';
+
+    $title = $formValues['behat_ui_title'];
+    $test = "Feature: $title\n  In order to test \"$title\"\n\n";
+
     $test .= $this->generateScenario($formValues);
     $handle = fopen($file, 'w+');
     fwrite($handle, $test);
     fclose($handle);
 
     // Run file.
-    $output = shell_exec("$behat_ui_behat_bin_path $behat_config $file --format html");
+    $output = shell_exec("cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file $file --format html");
 
     $report_html_file_name_and_path = $behat_ui_html_report_dir . '/' . $behat_ui_html_report_file;
 
@@ -266,10 +264,12 @@ class BehatUiNew extends FormBase {
     $report_html = fread($report_html_handle, filesize($report_html_file_name_and_path));
     fclose($report_html_handle);
 
-    unlink($file);
+    if (!$behat_ui_save_user_testing_features) {
+      unlink($file);
+    }
 
     $form['behat_ui_output'] = [
-      '#title' => t('Tests output'),
+      '#title' => $this->t('Tests output'),
       '#type' => 'markup',
       '#markup' => Markup::create('<div id="behat-ui-output"' . file_get_contents($report_html_file_name_and_path) . '</div>'),
     ];
@@ -279,22 +279,21 @@ class BehatUiNew extends FormBase {
   /**
    * Given a form_state, return a Behat scenario.
    */
-  public function generateScenario($form_state) {
+  public function generateScenario($formValues) {
     $scenario = "@api";
-    if ($form_state['behat_ui_javascript']) {
+    if ($formValues['behat_ui_javascript']) {
       $scenario .= " @javascript";
     }
-    $title = $form_state['behat_ui_title'];
+    $title = $formValues['behat_ui_title'];
     $scenario .= "\nScenario: $title\n";
 
-    $steps_count = count($form_state['values']['behat_ui_steps']);
+    $steps_count = count($formValues['behat_ui_steps']);
 
     for ($i = 0; $i < $steps_count; $i++) {
-      $type = $form_state['behat_ui_steps'][$i]['type'];
-      $step = $form_state['behat_ui_steps'][$i]['step'];
+      $type = $formValues['behat_ui_steps'][$i]['type'];
+      $step = $formValues['behat_ui_steps'][$i]['step'];
 
       if (!empty($type) && !empty($step)) {
-        // Blocks.
         $step = preg_replace('/\n\|/', "\n  |", preg_replace('/([:\|])\|/', "$1\n|", $step));
         $scenario .= "  $type $step\n";
       }

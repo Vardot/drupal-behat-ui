@@ -153,6 +153,7 @@ class BehatUiSettings extends ConfigFormBase {
       '#description' => $this->t('Basic authentication password for the targetted site.'),
       '#type' => 'password',
       '#default_value' => $config->get('behat_ui_http_password'),
+      '#suffix' => '</div></div>',
     ];
 
     $form['behat_ui_http_auth_headless_only'] = [
@@ -160,7 +161,13 @@ class BehatUiSettings extends ConfigFormBase {
       '#title' => $this->t('Enable HTTP authentication only for headless testing.'),
       '#default_value' => $config->get('behat_ui_http_auth_headless_only'),
       '#description' => $this->t('Sometimes testing using Selenium (or other driver that allows JavaScript) does not handle HTTP authentication well, for example when you have some link with some JavaScript behavior attached. On these cases, you may enable this HTTP authentication only for headless testing and find another solution for drivers that allow JavaScript (for example, with Selenium + JavaScript you can use the extension Auto Auth and save the credentials on a Firefox profile).'),
-      '#suffix' => '</div></div>',
+    ];
+
+    $form['behat_ui_save_user_testing_features'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Save user testing features'),
+      '#default_value' => $config->get('behat_ui_save_user_testing_features'),
+      '#description' => $this->t('Check if you want to save user testing features in the Behat Features path.'),
     ];
 
     $form['behat_ui_behat_tags'] = [

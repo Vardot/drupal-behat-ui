@@ -172,25 +172,6 @@
         });
       });
 
-      // Make autocomplete work.
-      var $autocomplete = $('#behat-ui-new-steps #autocomplete', context);
-
-      $autocomplete.find('li').live('click', function() {
-
-        var text   = $(this).text(),
-            $plain = $(this).parents('.field-rich-wrapper').find('.form-text'),
-            $rich  = $(this).parents('.field-rich-wrapper').find('.form-rich');
-
-        if (/:$/.test(text)) {
-          text += "| attribute | attribute || value     | value     |";
-        }
-
-        $plain.val(text);
-        $rich.html(syntaxHighlight(text));
-        $(this).parents('.field-rich-wrapper').height($rich.height() - 2);
-        $(this).parents('#autocomplete').remove();
-      });
-
     }
   };
 

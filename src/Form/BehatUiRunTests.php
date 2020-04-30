@@ -37,7 +37,6 @@ class BehatUiRunTests extends FormBase {
     $behat_ui_http_auth_headless_only = $config->get('behat_ui_http_auth_headless_only');
 
     $pid = $config->get('behat_ui_pidfile');
-    $outfile = $config->get('behat_ui_outfile');
 
     $form['submit_button'] = [
       '#type' => 'submit',
@@ -91,6 +90,9 @@ class BehatUiRunTests extends FormBase {
     $config = \Drupal::config('behat_ui.settings');
     $behat_ui_behat_bin_path = $config->get('behat_ui_behat_bin_path');
     $behat_ui_behat_config_path = $config->get('behat_ui_behat_config_path');
+    $behat_ui_behat_config_file = $config->get('behat_ui_behat_config_file');
+
+    $behat_ui_behat_features_path = $config->get('behat_ui_behat_features_path');
 
     $behat_ui_html_report_dir = $config->get('behat_ui_html_report_dir');
     $behat_ui_html_report_file = $config->get('behat_ui_html_report_file');
@@ -106,22 +108,17 @@ class BehatUiRunTests extends FormBase {
 
     $message = \Drupal::messenger();
 
-    if (isset($pid) && $pid = 'behat_ui_process_id_running') {
+    if (!isset($pid)) {
       $config = \Drupal::config('behat_ui.settings');
-
-      $behat_config_path = "-c " . $behat_ui_behat_config_path;
 
       $filePath = $behat_ui_log_report_dir . '/' . $behat_ui_log_report_file;
       if (!\Drupal::service('file_system')->prepareDirectory($filePath, FileSystemInterface::CREATE_DIRECTORY)) {
         $message->addError(t('Output directory does not exists or is not writable.'));
       }
 
-      $outfile = $behat_ui_log_report_dir . '/' . $behat_ui_log_report_file;
-      $report_dir = $filePath;
-
-      $command = "$behat_ui_behat_bin_path $behat_config_path -f pretty --out std > $outfile&";
+      $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file $behat_ui_behat_features_path --format pretty --out std > $filePath&";
       if ($behat_ui_http_auth_headless_only) {
-        $command = "$behat_ui_behat_bin_path $behat_config_path --format pretty --out std --format html --out > $outfile &";
+        $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file $behat_ui_behat_features_path --format pretty --out std --format html";
       }
       $process = new Process($command);
       $process->enableOutput();

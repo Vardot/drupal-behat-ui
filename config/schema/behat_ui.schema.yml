@@ -27,8 +27,8 @@ behat_ui.settings:
       type: string
       label: 'HTML report file'
     behat_ui_logs_report_dir:
-       type: string
-       label: 'Log report directory'
+      type: string
+      label: 'Log report directory'
     behat_ui_logs_report_file:
       type: string
       label: 'Log report file'
@@ -40,10 +40,7 @@ behat_ui.settings:
       label: 'HTTP Authentication Password'
     behat_ui_http_auth_headless_only:
       type: boolean
-      lable: 'HTTP authentication only'
-    behat_ui_pidfile:
-      type: string
-      label: 'Path to Behat binary'
-    behat_ui_outfile:
-      type: string
-      label: 'Path to Behat binary'
+      label: 'HTTP authentication only'
+    behat_ui_save_user_testing_features:
+      type: boolean
+      label: 'Save user testing features'

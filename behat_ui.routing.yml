@@ -1,5 +1,5 @@
 behat_ui.run_tests:
-  path: /admin/config/development/behat-ui
+  path: '/admin/config/development/behat-ui'
   defaults:
     _title: 'Behat UI'
     _form: \Drupal\behat_ui\Form\BehatUiRunTests
@@ -8,7 +8,7 @@ behat_ui.run_tests:
   options:
     _admin_route: TRUE
 behat_ui.settings:
-  path: /admin/config/development/behat-ui/settings
+  path: '/admin/config/development/behat-ui/settings'
   defaults:
     _title: 'Behat UI'
     _form: \Drupal\behat_ui\Form\BehatUiSettings
@@ -17,7 +17,7 @@ behat_ui.settings:
   options:
     _admin_route: TRUE
 behat_ui.new:
-  path: /admin/config/development/behat-ui/new
+  path: '/admin/config/development/behat-ui/new'
   defaults:
     _title: 'Create test'
     _form: \Drupal\behat_ui\Form\BehatUiNew
@@ -26,7 +26,7 @@ behat_ui.new:
   options:
     _admin_route: TRUE
 behat_ui.behat_dl:
-  path: /admin/config/development/behat-ui/behat-dl
+  path: '/admin/config/development/behat-ui/behat-dl'
   defaults:
     _title: 'Behat definition steps'
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::getDefinitionSteps'
@@ -35,7 +35,7 @@ behat_ui.behat_dl:
   options:
     _admin_route: TRUE
 behat_ui.behat_di:
-  path: /admin/config/development/behat-ui/behat-di
+  path: '/admin/config/development/behat-ui/behat-di'
   defaults:
     _title: 'Behat definitions steps with extended info'
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::getDefinitionStepsWithInfo'
@@ -44,7 +44,7 @@ behat_ui.behat_di:
   options:
     _admin_route: TRUE
 behat_ui.status:
-  path: /behat-ui/status
+  path: '/behat-ui/status'
   defaults:
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::getTestStatus'
   requirements:
@@ -52,15 +52,16 @@ behat_ui.status:
   options:
     _admin_route: TRUE
 behat_ui.autocomplete:
-  path: /behat-ui/autocomplete
+  path: '/behat-ui/autocomplete'
   defaults:
-    _controller: '\Drupal\behat_ui\Controller\BehatUiController::autocomplete'
+    _controller: '\Drupal\behat_ui\Controller\BehatUiController::autocompleteStep'
+    _format: json
   requirements:
     _permission: 'administer site configuration'
   options:
     _admin_route: TRUE
 behat_ui.kill:
-  path: /behat-ui/kill
+  path: '/behat-ui/kill'
   defaults:
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::kill'
   requirements:

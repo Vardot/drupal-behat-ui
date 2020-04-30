@@ -4,6 +4,8 @@ namespace Drupal\behat_ui\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Drupal\Component\Utility\Xss;
 
 /**
  * Default Behat Ui controller for the Behat Ui module.
@@ -40,17 +42,25 @@ class BehatUiController extends ControllerBase {
   }
 
   /**
-   * Auto complete.
+   * Auto complete Step.
    */
-  public function autocomplete($string) {
+  public function autocompleteStep(Request $request) {
     $matches = [];
 
-    $steps = explode('<br />', $this->autocompleteDefinitionSteps());
+    $input = $request->query->get('q');
+
+    if (!$input) {
+      return new JsonResponse($matches);
+    }
+
+    $input = Xss::filter($input);
+
+    $steps = explode('<br />', $this->getAutocompleteDefinitionSteps());
     foreach ($steps as $step) {
       $title = preg_replace('/^\s*(Given|Then|When|And|But) \/\^/', '', $step);
       $title = preg_replace('/\$\/$/', '', $title);
-      if (preg_match('/' . preg_quote($string) . '/', $title)) {
-        $matches[$title] = $title;
+      if (preg_match('/' . preg_quote($input) . '/', $title)) {
+        $matches[] = ['value' => $title, 'label' => Html::escape($title)];
       }
     }
 
@@ -65,9 +75,10 @@ class BehatUiController extends ControllerBase {
     $tempstore = \Drupal::service('user.private_tempstore')->get('behat_ui');
     $pid = $tempstore->get('behat_ui_pid');
 
-    if ($pid) {
+    if (isset($pid) && $pid == 'behat_ui_process_id_running') {
       try {
         $response = posix_kill($pid, SIGKILL);
+        $tempstore->delete('behat_ui_pid');
       }
       catch (Exception $e) {
         $response = FALSE;
@@ -130,10 +141,7 @@ class BehatUiController extends ControllerBase {
     $output = shell_exec($cmd);
     $output = nl2br(htmlentities($output));
 
-    $build = [
-      '#markup' => $this->formatBehatSteps($output, '', ''),
-    ];
-    return $build;
+    return $this->formatBehatSteps($output, '', '');
   }
 
   /**

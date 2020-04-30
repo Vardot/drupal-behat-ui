@@ -65,7 +65,7 @@
 }
 
 #behat-ui-new-steps {
-  .form-type-textfield {
+  .form-type--textfield {
     .form-rich,
     .form-text.form-rich-processed {
       position: absolute;
@@ -150,6 +150,10 @@
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
+
+        .form-type--textfield {
+          width: 89%;
+        }
       }
     }
   } 

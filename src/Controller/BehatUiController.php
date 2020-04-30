@@ -141,8 +141,16 @@ class BehatUiController extends ControllerBase {
     $cmd = "cd $behat_config_path; $behat_bin -dl | sed 's/^\s*//g'";
     $output = shell_exec($cmd);
     $output = nl2br(htmlentities($output));
+    
+    $output = str_replace('default |', '', $output);
+    $output = str_replace('Given', '', $output);
+    $output = str_replace('When', '', $output);
+    $output = str_replace('Then', '', $output);
+    $output = str_replace('And', '', $output);
+    $output = str_replace('But', '', $output);
+    $output = str_replace('/^', '', $output);
 
-    return $this->formatBehatSteps($output, '', '<br />');
+    return $output;
   }
 
   /**

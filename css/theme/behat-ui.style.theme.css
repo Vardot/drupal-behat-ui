@@ -55,8 +55,8 @@
   outline: none;
 }
 
-#behat-ui-new-steps .form-type-textfield .form-rich,
-#behat-ui-new-steps .form-type-textfield .form-text.form-rich-processed {
+#behat-ui-new-steps .form-type--textfield .form-rich,
+#behat-ui-new-steps .form-type--textfield .form-text.form-rich-processed {
   position: absolute;
   left: 0;
   top: 0;
@@ -65,17 +65,17 @@
   outline: none;
 }
 
-#behat-ui-new-steps .form-type-textfield .form-rich {
+#behat-ui-new-steps .form-type--textfield .form-rich {
   z-index: 1;
   background: transparent;
 }
 
-#behat-ui-new-steps .form-type-textfield .form-text.form-rich-processed {
+#behat-ui-new-steps .form-type--textfield .form-text.form-rich-processed {
   color: transparent;
   background-position: 100% 2px;
 }
 
-#behat-ui-new-steps .form-type-textfield .form-text.form-rich-processed.throbbing {
+#behat-ui-new-steps .form-type--textfield .form-text.form-rich-processed.throbbing {
   background-position: 100% -18px;
 }
 
@@ -140,9 +140,13 @@
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
   -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
   -webkit-flex-wrap: nowrap;
-  -ms-flex-wrap: nowrap;
-  flex-wrap: nowrap;
+      -ms-flex-wrap: nowrap;
+          flex-wrap: nowrap;
+}
+
+#behat-ui-new-steps .fieldset__wrapper .form-item .fieldset__wrapper .form-type--textfield {
+  width: 89%;
 }

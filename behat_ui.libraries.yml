@@ -7,7 +7,11 @@ run-tests-scripts:
   version: VERSION
   js:
     js/behat-ui.run-tests.js: {}
+  dependencies:
+     - core/drupal.ajax
 new-test-scripts:
   version: VERSION
   js:
     js/behat-ui.new-test.js: {}
+  dependencies:
+     - core/drupal.ajax

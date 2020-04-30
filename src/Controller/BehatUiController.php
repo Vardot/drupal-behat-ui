@@ -6,6 +6,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Component\Utility\Xss;
+use Drupal\Component\Utility\Html;
 
 /**
  * Default Behat Ui controller for the Behat Ui module.
@@ -26,7 +27,7 @@ class BehatUiController extends ControllerBase {
 
     $behat_ui_http_auth_headless_only = $config->get('behat_ui_http_auth_headless_only');
 
-    $tempstore = \Drupal::service('user.private_tempstore')->get('behat_ui');
+    $tempstore = \Drupal::service('tempstore.private')->get('behat_ui');
     $pid = $tempstore->get('behat_ui_pid');
 
     if (isset($pid) && $this->processRunning($pid)) {
@@ -60,7 +61,7 @@ class BehatUiController extends ControllerBase {
       $title = preg_replace('/^\s*(Given|Then|When|And|But) \/\^/', '', $step);
       $title = preg_replace('/\$\/$/', '', $title);
       if (preg_match('/' . preg_quote($input) . '/', $title)) {
-        $matches[] = ['value' => $title, 'label' => Html::escape($title)];
+        $matches[] = ['value' => $title, 'label' => $title];
       }
     }
 
@@ -72,10 +73,10 @@ class BehatUiController extends ControllerBase {
    */
   public function kill() {
     $response = FALSE;
-    $tempstore = \Drupal::service('user.private_tempstore')->get('behat_ui');
+    $tempstore = \Drupal::service('tempstore.private')->get('behat_ui');
     $pid = $tempstore->get('behat_ui_pid');
 
-    if (isset($pid) && $pid == 'behat_ui_process_id_running') {
+    if ($pid) {
       try {
         $response = posix_kill($pid, SIGKILL);
         $tempstore->delete('behat_ui_pid');
@@ -141,7 +142,7 @@ class BehatUiController extends ControllerBase {
     $output = shell_exec($cmd);
     $output = nl2br(htmlentities($output));
 
-    return $this->formatBehatSteps($output, '', '');
+    return $this->formatBehatSteps($output, '', '<br />');
   }
 
   /**

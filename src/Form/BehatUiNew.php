@@ -135,7 +135,7 @@ class BehatUiNew extends FormBase {
     ];
 
     $form['behat_ui_run'] = [
-      '#type' => 'submit',
+      '#type' => 'button',
       '#value' => $this->t('Run >>'),
       '#ajax' => [
         'callback' => '::runSingleTest',
@@ -230,7 +230,7 @@ class BehatUiNew extends FormBase {
   /**
    * Run a single test.
    */
-  public function runSingleTest($form, &$form_state) {
+  public function runSingleTest(array &$form, FormStateInterface $form_state) {
     $config = \Drupal::config('behat_ui.settings');
     $behat_ui_behat_bin_path = $config->get('behat_ui_behat_bin_path');
     $behat_ui_behat_config_path = $config->get('behat_ui_behat_config_path');

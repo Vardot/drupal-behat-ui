@@ -36,7 +36,8 @@ class BehatUiRunTests extends FormBase {
 
     $behat_ui_http_auth_headless_only = $config->get('behat_ui_http_auth_headless_only');
 
-    $pid = $config->get('behat_ui_pidfile');
+    $tempstore = \Drupal::service('tempstore.private')->get('behat_ui');
+    $pid = $tempstore->get('behat_ui_pid');
 
     $form['submit_button'] = [
       '#type' => 'submit',
@@ -102,8 +103,7 @@ class BehatUiRunTests extends FormBase {
 
     $behat_ui_http_auth_headless_only = $config->get('behat_ui_http_auth_headless_only');
 
-    $tempstore = \Drupal::service('user.private_tempstore')->get('behat_ui');
-
+    $tempstore = \Drupal::service('tempstore.private')->get('behat_ui');
     $pid = $tempstore->get('behat_ui_pid');
 
     $message = \Drupal::messenger();
@@ -124,8 +124,7 @@ class BehatUiRunTests extends FormBase {
       $process->enableOutput();
       $process->start();
       $message->addMessage($process->getExitCodeText());
-
-      $tempstore->set('behat_ui_pid', 'behat_ui_process_id_running');
+      $tempstore->create('behat_ui_pid', 'behat_ui_process_id_running');
     }
     else {
       $message->addMessage($this->t('Tests are already running.'));

@@ -19,11 +19,12 @@ class BehatUiController extends ControllerBase {
   public function getTestStatus() {
     $running = FALSE;
     $config = \Drupal::config('behat_ui.settings');
-    $behat_ui_behat_bin_path = $config->get('behat_ui_behat_bin_path');
-    $behat_ui_behat_config_path = $config->get('behat_ui_behat_config_path');
 
     $behat_ui_html_report_dir = $config->get('behat_ui_html_report_dir');
     $behat_ui_html_report_file = $config->get('behat_ui_html_report_file');
+
+    $behat_ui_log_report_dir = $config->get('behat_ui_log_report_dir');
+    $behat_ui_log_report_file = $config->get('behat_ui_log_report_file');
 
     $behat_ui_http_auth_headless_only = $config->get('behat_ui_http_auth_headless_only');
 
@@ -33,12 +34,33 @@ class BehatUiController extends ControllerBase {
     if (isset($pid) && $this->processRunning($pid)) {
       $running = TRUE;
     }
-    if ($behat_ui_http_auth_headless_only && $behat_ui_html_report_dir) {
-      $output = file_get_contents($behat_ui_html_report_dir . '/' . $behat_ui_html_report_file);
+
+    $output = '';
+    if ($behat_ui_http_auth_headless_only) {
+      if (isset($behat_ui_html_report_dir) && $behat_ui_html_report_dir != ''
+        && isset($behat_ui_html_report_file) && $behat_ui_html_report_file != '') {
+
+        $html_report = $behat_ui_html_report_dir . '/' . $behat_ui_html_report_file;
+
+        if ($html_report && file_exists($html_report)) {
+          $output = file_get_contents($html_report);
+        }
+      }
+
     }
-    elseif ($outfile && file_exists($outfile)) {
-      $output = nl2br(htmlentities(file_get_contents($outfile)));
+    else {
+
+      if (isset($behat_ui_log_report_dir) && $behat_ui_log_report_dir != ''
+        && isset($behat_ui_log_report_file) && $behat_ui_log_report_file != '') {
+
+        $log_report = $behat_ui_log_report_dir . '/' . $behat_ui_log_report_file;
+
+        if ($log_report && file_exists($log_report)) {
+          $output = nl2br(htmlentities(file_get_contents($log_report)));
+        }
+      }
     }
+
     return new JsonResponse(['running' => $running, 'output' => $output]);
   }
 

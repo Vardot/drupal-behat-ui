@@ -7,20 +7,40 @@
   "minimum-stability": "dev",
   "authors": [
     {
+      "name": "Vardot",
+      "homepage": "https://www.drupal.org/vardot",
+      "role": "Maintaining the Drupal 8 version"
+    },
+    {
       "name": "Webship",
-      "homepage": "http://webship.org",
-      "role": "Maintainer"
+      "homepage": "https://www.drupal.org/webship",
+      "role": "Volunteer contributions"
+    },
+    {
+      "name": "Meedan",
+      "homepage": "https://www.drupal.org/meedan",
+      "role": "Sponsorship for the Drupal 7 version"
     }
   ],
   "support": {
     "issues": "https://www.drupal.org/project/issues/behat_ui",
     "source": "http://cgit.drupalcode.org/behat_ui"
   },
+  "repositories": {
+    "drupal": {
+      "type": "composer",
+      "url": "https://packages.drupal.org/8"
+    }
+  },
   "require": {
     "composer/installers": "~1.0",
     "oomphinc/composer-installers-extender": "~1.0",
     "cweagans/composer-patches": "~1.0",
-    "drupal/drupal-library-installer-plugin": "^0.3"
+    "drupal/drupal-library-installer-plugin": "^0.3",
+    "drupal/core": "^8.8.0 || ~9.0.0",
+    "behat/behat": "~3.0",
+    "drupal/drupal-extension": "^3.2",
+    "emuse/behat-html-formatter": "^0.2.0"
   },
   "extra": {
     "branch-alias": {

@@ -26,6 +26,8 @@ class BehatUiNew extends FormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['#attached']['library'][] = 'behat_ui/style';
     $form['#attached']['library'][] = 'behat_ui/new-test-scripts';
+    
+    $config = \Drupal::config('behat_ui.settings');
 
     $form['behat_ui_new_scenario'] = [
       '#type' => 'markup',
@@ -115,7 +117,7 @@ class BehatUiNew extends FormBase {
     $form['behat_ui_new_scenario']['behat_ui_javascript'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Needs a real browser'),
-      '#default_value' => 0,
+      '#default_value' => $config->get('behat_ui_needs_browser'),
       '#description' => $this->t('Check this if this test needs a real browser, which supports JavaScript, in order to perform actions that happen without reloading the page.'),
     ];
 

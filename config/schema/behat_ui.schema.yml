@@ -47,3 +47,6 @@ behat_ui.settings:
     behat_ui_save_user_testing_features:
       type: boolean
       label: 'Save user testing features'
+    behat_ui_needs_browser:
+      type: boolean
+      label: 'Needs a real browser'

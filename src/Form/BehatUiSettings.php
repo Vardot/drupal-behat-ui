@@ -103,7 +103,7 @@ class BehatUiSettings extends ConfigFormBase {
 
     $form['behat_ui_html_report'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Enable HTTP Report Format'),
+      '#title' => $this->t('Enable HTML Report Format'),
       '#default_value' => $config->get('behat_ui_html_report'),
       '#description' => $this->t('Chack to enable generating HTML reports from your test results.'),
       '#prefix' => '<div class="panel">'
@@ -168,6 +168,13 @@ class BehatUiSettings extends ConfigFormBase {
       '#title' => $this->t('Enable HTTP authentication only for headless testing.'),
       '#default_value' => $config->get('behat_ui_http_auth_headless_only'),
       '#description' => $this->t('Sometimes testing using Selenium (or other driver that allows JavaScript) does not handle HTTP authentication well, for example when you have some link with some JavaScript behavior attached. On these cases, you may enable this HTTP authentication only for headless testing and find another solution for drivers that allow JavaScript (for example, with Selenium + JavaScript you can use the extension Auto Auth and save the credentials on a Firefox profile).'),
+    ];
+    
+    $form['behat_ui_needs_browser'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Needs a real browser'),
+      '#default_value' => $config->get('behat_ui_needs_browser'),
+      '#description' => $this->t('Check this if this test needs a real browser driver using Selenium, which supports JavaScript, in order to perform actions that happen without reloading the page.'),
     ];
 
     $form['behat_ui_save_user_testing_features'] = [

@@ -75,12 +75,12 @@
       border: 0;
       outline: none;
     }
-    
+
     .form-rich {
       z-index: 1;
       background: transparent;
     }
-    
+
     .form-text.form-rich-processed {
       color: transparent;
       background-position: 100% 2px;
@@ -90,17 +90,18 @@
       }
     }
   }
-  
+
   .step-param {
     font-weight: bold;
     color: #000;
   }
-  
+
   .step-no-param {
     font-weight: normal;
     color: #666;
+    font-size: 0.8rem;
   }
-  
+
   .sort-up,
   .sort-down,
   .remove {
@@ -146,15 +147,31 @@
 
   .fieldset__wrapper {
     .form-item {
-     .fieldset__wrapper {
+      margin: 0;
+
+      .fieldset__wrapper {
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
+        padding: 0;
+        margin: 3px 0;
 
         .form-type--textfield {
-          width: 89%;
+          width: 87%;
         }
       }
     }
-  } 
+    
+    fieldset {
+     border: 0;
+     box-shadow: none;
+     margin: 0;
+    }
+  }
+  
+
+
+  .claro-autocomplete {
+    margin: 0;
+  }
 }

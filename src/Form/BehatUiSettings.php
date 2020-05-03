@@ -101,14 +101,21 @@ class BehatUiSettings extends ConfigFormBase {
       '#suffix' => '</div></div>',
     ];
 
+    $form['behat_ui_html_report'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable HTTP Report Format'),
+      '#default_value' => $config->get('behat_ui_html_report'),
+      '#description' => $this->t('Chack to enable generating HTML reports from your test results.'),
+      '#prefix' => '<div class="panel">'
+      . '  <h3 class="panel__title">' . $this->t('HTML Formated Report') . '</h3>'
+      . '  <div class="panel__content">',
+    ];
+    
     $form['behat_ui_html_report_dir'] = [
       '#title' => $this->t('HTML report directory'),
       '#description' => $this->t('Add the full phiscial path for the tests/reports . No trailing slash at the end'),
       '#type' => 'textfield',
       '#default_value' => $config->get('behat_ui_html_report_dir'),
-      '#prefix' => '<div class="panel">'
-      . '  <h3 class="panel__title">' . $this->t('HTML Formated Report') . '</h3>'
-      . '  <div class="panel__content">',
     ];
 
     $form['behat_ui_html_report_file'] = [
@@ -120,17 +127,17 @@ class BehatUiSettings extends ConfigFormBase {
     ];
 
     $form['behat_ui_log_report_dir'] = [
-      '#title' => $this->t('Log report directory'),
+      '#title' => $this->t('Console Log report directory'),
       '#description' => $this->t('Add the full phiscial path for the tests/logs . No trailing slash at the end'),
       '#type' => 'textfield',
       '#default_value' => $config->get('behat_ui_log_report_dir'),
       '#prefix' => '<div class="panel">'
-      . '  <h3 class="panel__title">' . $this->t('Log Report') . '</h3>'
+      . '  <h3 class="panel__title">' . $this->t('Console Log Report Format') . '</h3>'
       . '  <div class="panel__content">',
     ];
 
     $form['behat_ui_log_report_file'] = [
-      '#title' => $this->t('Log report file'),
+      '#title' => $this->t('Console Log report file'),
       '#description' => $this->t('a .log or .out file to which will be used in the log reporting.'),
       '#type' => 'textfield',
       '#default_value' => $config->get('behat_ui_log_report_file'),
@@ -181,6 +188,7 @@ class BehatUiSettings extends ConfigFormBase {
         <br /> <b>Actions:</b>
         <ul>
           <li>[ javascript|Selenium + JavaScript ] <b>@javascript</b> = Run scenarios with Selenium + JavaScript needed in the page.</li>
+          <li>[ api|Drupal API ] <b>@api</b> = Run scenarios with Drupal API when we only have file access to the site.</li>
         </ul>
         <br /> <b>Environment:</b>
         <ul>

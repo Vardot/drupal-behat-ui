@@ -33,8 +33,11 @@ class BehatUiRunTests extends FormBase {
 
     $behat_ui_html_report_dir = $config->get('behat_ui_html_report_dir');
     $behat_ui_html_report_file = $config->get('behat_ui_html_report_file');
+    
+    $behat_ui_log_report_dir = $config->get('behat_ui_log_report_dir');
+    $behat_ui_log_report_file = $config->get('behat_ui_log_report_file');
 
-    $behat_ui_http_auth_headless_only = $config->get('behat_ui_http_auth_headless_only');
+    $behat_ui_html_report = $config->get('behat_ui_html_report');
 
     $tempstore = \Drupal::service('tempstore.private')->get('behat_ui');
     $pid = $tempstore->get('behat_ui_pid');
@@ -61,17 +64,66 @@ class BehatUiRunTests extends FormBase {
 
     $output = '';
 
-    if ($behat_ui_http_auth_headless_only && $behat_ui_html_report_dir) {
-      $output = file_get_contents($behat_ui_html_report_dir . '/' . $behat_ui_html_report_file);
+    if ($behat_ui_html_report) {
+
+      if (isset($behat_ui_html_report_dir) && $behat_ui_html_report_dir != ''
+        && isset($behat_ui_html_report_file) && $behat_ui_html_report_file != '') {
+
+        $html_report_output = $behat_ui_html_report_dir . '/' . $behat_ui_html_report_file;
+        if ($html_report_output && file_exists($html_report_output)) {
+          $form['behat_ui_output'] = [
+            '#title' => $this->t('Tests output'),
+            '#type' => 'markup',
+            '#markup' => '<iframe id="behat-ui-output" src="file://' . $html_report_output .'"></iframe>',
+          ];
+        }
+        else {
+          $form['behat_ui_output'] = [
+            '#title' => $this->t('Tests output'),
+            '#type' => 'markup',
+            '#markup' => '<div id="behat-ui-output">' . $this->t('No HTML report yet') . '</div>',
+          ];
+        }
+      }
+      else {
+        $form['behat_ui_output'] = [
+          '#title' => $this->t('Tests output'),
+          '#type' => 'markup',
+          '#markup' => '<div id="behat-ui-output">' . $this->t('HTML report directory and file are not configured') . '</div>',
+        ];
+      }
     }
-    elseif ($outfile && file_exists($outfile)) {
-      $output = nl2br(htmlentities(file_get_contents($outfile)));
+    else {
+      
+      if (isset($behat_ui_log_report_dir) && $behat_ui_log_report_dir != ''
+        && isset($behat_ui_log_report_file) && $behat_ui_log_report_file != '') {
+              
+
+        $log_report_output = $behat_ui_log_report_dir . '/' . $behat_ui_log_report_file;
+        if ($log_report_output && file_exists($log_report_output)) {
+          $log_report_output_content = nl2br(htmlentities(file_get_contents($log_report_output)));
+          $form['behat_ui_output'] = [
+            '#title' => $this->t('Tests output'),
+            '#type' => 'markup',
+            '#markup' => '<div id="behat-ui-output">' . $log_report_output_content . '</div>',
+          ];
+        }
+        else {
+          $form['behat_ui_output'] = [
+            '#title' => $this->t('Tests output'),
+            '#type' => 'markup',
+            '#markup' => '<div id="behat-ui-output">' . $this->t('No Log report yet') . '</div>',
+          ];
+        }
+      }
+      else {
+        $form['behat_ui_output'] = [
+          '#title' => $this->t('Tests output'),
+          '#type' => 'markup',
+          '#markup' => '<div id="behat-ui-output">' . $this->t('The Log report directory and file is not configured') . '</div>',
+        ];
+      }
     }
-    $form['behat_ui_output'] = [
-      '#title' => $this->t('Tests output'),
-      '#type' => 'markup',
-      '#markup' => '<div id="behat-ui-output">' . $output . '</div>',
-    ];
 
     return $form;
   }
@@ -101,30 +153,56 @@ class BehatUiRunTests extends FormBase {
     $behat_ui_log_report_dir = $config->get('behat_ui_log_report_dir');
     $behat_ui_log_report_file = $config->get('behat_ui_log_report_file');
 
-    $behat_ui_http_auth_headless_only = $config->get('behat_ui_http_auth_headless_only');
+    $behat_ui_html_report = $config->get('behat_ui_html_report');
 
     $tempstore = \Drupal::service('tempstore.private')->get('behat_ui');
     $pid = $tempstore->get('behat_ui_pid');
 
     $message = \Drupal::messenger();
+    $command = '';
 
     if (!isset($pid)) {
-      $config = \Drupal::config('behat_ui.settings');
+      
+      if ($behat_ui_html_report) {
 
-      $filePath = $behat_ui_log_report_dir . '/' . $behat_ui_log_report_file;
-      if (!\Drupal::service('file_system')->prepareDirectory($filePath, FileSystemInterface::CREATE_DIRECTORY)) {
-        $message->addError(t('Output directory does not exists or is not writable.'));
+      if (isset($behat_ui_html_report_dir) && $behat_ui_html_report_dir != ''
+        && isset($behat_ui_html_report_file) && $behat_ui_html_report_file != '') {
+          
+          if (\Drupal::service('file_system')->prepareDirectory($behat_ui_html_report_dir, FileSystemInterface::CREATE_DIRECTORY)) {
+            $html_report_output_file = $behat_ui_html_report_dir . '/' . $behat_ui_html_report_file;
+            $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file $behat_ui_behat_features_path --format pretty --format html --out $behat_ui_html_report_dir";
+          }
+          else {
+            $message->addError($this->t('The HTML Output directory does not exists or is not writable.'));
+          }
+        }
+        else {
+          $message->addError($this->t('HTML report directory and file is not configured.'));
+        }
+
+      }
+      else {
+
+      if (isset($behat_ui_log_report_dir) && $behat_ui_log_report_dir != ''
+        && isset($behat_ui_log_report_file) && $behat_ui_log_report_file != '') {
+          if (\Drupal::service('file_system')->prepareDirectory($behat_ui_log_report_dir, FileSystemInterface::CREATE_DIRECTORY)) {
+            $log_report_output_file = $behat_ui_log_report_dir . '/' . $behat_ui_log_report_file;
+            $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file $behat_ui_behat_features_path --format pretty --out std > $log_report_output_file&";
+          }
+          else {
+            $message->addError($this->t('The Log Output directory does not exists or is not writable.'));
+          }
+        }
+        else {
+          $message->addError($this->t('The Log directory and file is not configured.')); 
+        }
       }
 
-      $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file $behat_ui_behat_features_path --format pretty --out std > $filePath&";
-      if ($behat_ui_http_auth_headless_only) {
-        $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file $behat_ui_behat_features_path --format pretty --out std --format html";
-      }
       $process = new Process($command);
       $process->enableOutput();
       $process->start();
       $message->addMessage($process->getExitCodeText());
-      $tempstore->create('behat_ui_pid', 'behat_ui_process_id_running');
+      $tempstore->set('behat_ui_pid', 'behat_ui_process_id_running');
     }
     else {
       $message->addMessage($this->t('Tests are already running.'));

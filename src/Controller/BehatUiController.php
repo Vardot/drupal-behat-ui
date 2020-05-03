@@ -26,7 +26,7 @@ class BehatUiController extends ControllerBase {
     $behat_ui_log_report_dir = $config->get('behat_ui_log_report_dir');
     $behat_ui_log_report_file = $config->get('behat_ui_log_report_file');
 
-    $behat_ui_http_auth_headless_only = $config->get('behat_ui_http_auth_headless_only');
+    $behat_ui_html_report = $config->get('behat_ui_html_report');
 
     $tempstore = \Drupal::service('tempstore.private')->get('behat_ui');
     $pid = $tempstore->get('behat_ui_pid');
@@ -36,7 +36,7 @@ class BehatUiController extends ControllerBase {
     }
 
     $output = '';
-    if ($behat_ui_http_auth_headless_only) {
+    if ($behat_ui_html_report) {
       if (isset($behat_ui_html_report_dir) && $behat_ui_html_report_dir != ''
         && isset($behat_ui_html_report_file) && $behat_ui_html_report_file != '') {
 

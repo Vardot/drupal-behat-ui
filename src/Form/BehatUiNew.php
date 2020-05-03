@@ -196,7 +196,7 @@ class BehatUiNew extends FormBase {
       $response->headers->set('Content-Disposition', 'attachment; filename="' . $file_name . '"');
       $response->headers->set('Pragma', 'no-cache');
       $response->headers->set('Content-Transfer-Encoding', 'binary');
-      $response->headers->set('Content-Length', filesize($file));
+      $response->headers->set('Content-Length', $file_size);
       $form_state->disableRedirect();
       readfile($file);
       return $response->send();
@@ -256,7 +256,11 @@ class BehatUiNew extends FormBase {
     fclose($handle);
 
     // Run file.
-    $output = shell_exec("cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file $file --format html");
+    $test_file = $behat_ui_behat_features_path . '/' . $file_user_time . '.feature';
+    $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path $test_file --format pretty --out std --format html";
+   
+    
+    $output = shell_exec($command);
 
     $report_html_file_name_and_path = $behat_ui_html_report_dir . '/' . $behat_ui_html_report_file;
 
@@ -280,7 +284,7 @@ class BehatUiNew extends FormBase {
    * Given a form_state, return a Behat scenario.
    */
   public function generateScenario($formValues) {
-    $scenario = "@api";
+    $scenario = "";
     if ($formValues['behat_ui_javascript']) {
       $scenario .= " @javascript";
     }

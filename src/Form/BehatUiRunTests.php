@@ -71,10 +71,11 @@ class BehatUiRunTests extends FormBase {
 
         $html_report_output = $behat_ui_html_report_dir . '/' . $behat_ui_html_report_file;
         if ($html_report_output && file_exists($html_report_output)) {
+          $html_report_output_content = file_get_contents($html_report_output);
           $form['behat_ui_output'] = [
             '#title' => $this->t('Tests output'),
             '#type' => 'markup',
-            '#markup' => '<iframe id="behat-ui-output" src="file://' . $html_report_output .'"></iframe>',
+            '#markup' => '<div id="behat-ui-output">' . $html_report_output_content . '</div>',
           ];
         }
         else {
@@ -86,11 +87,7 @@ class BehatUiRunTests extends FormBase {
         }
       }
       else {
-        $form['behat_ui_output'] = [
-          '#title' => $this->t('Tests output'),
-          '#type' => 'markup',
-          '#markup' => '<div id="behat-ui-output">' . $this->t('HTML report directory and file are not configured') . '</div>',
-        ];
+        $message->addError($this->t('The HTML report directory and file is not configured.'));
       }
     }
     else {
@@ -117,11 +114,7 @@ class BehatUiRunTests extends FormBase {
         }
       }
       else {
-        $form['behat_ui_output'] = [
-          '#title' => $this->t('Tests output'),
-          '#type' => 'markup',
-          '#markup' => '<div id="behat-ui-output">' . $this->t('The Log report directory and file is not configured') . '</div>',
-        ];
+        $message->addError($this->t('The Console Log report directory and file is not configured.'));
       }
     }
 
@@ -170,7 +163,7 @@ class BehatUiRunTests extends FormBase {
           
           if (\Drupal::service('file_system')->prepareDirectory($behat_ui_html_report_dir, FileSystemInterface::CREATE_DIRECTORY)) {
             $html_report_output_file = $behat_ui_html_report_dir . '/' . $behat_ui_html_report_file;
-            $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file $behat_ui_behat_features_path --format pretty --format html --out $behat_ui_html_report_dir";
+            $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file $behat_ui_behat_features_path --format pretty --out std --format html";
           }
           else {
             $message->addError($this->t('The HTML Output directory does not exists or is not writable.'));
@@ -183,8 +176,9 @@ class BehatUiRunTests extends FormBase {
       }
       else {
 
-      if (isset($behat_ui_log_report_dir) && $behat_ui_log_report_dir != ''
-        && isset($behat_ui_log_report_file) && $behat_ui_log_report_file != '') {
+        if (isset($behat_ui_log_report_dir) && $behat_ui_log_report_dir != ''
+          && isset($behat_ui_log_report_file) && $behat_ui_log_report_file != '') {
+
           if (\Drupal::service('file_system')->prepareDirectory($behat_ui_log_report_dir, FileSystemInterface::CREATE_DIRECTORY)) {
             $log_report_output_file = $behat_ui_log_report_dir . '/' . $behat_ui_log_report_file;
             $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file $behat_ui_behat_features_path --format pretty --out std > $log_report_output_file&";

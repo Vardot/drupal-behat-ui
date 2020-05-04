@@ -4,7 +4,7 @@ behat_ui.run_tests:
     _title: 'Behat UI'
     _form: \Drupal\behat_ui\Form\BehatUiRunTests
   requirements:
-    _permission: 'administer site configuration'
+    _permission: 'run all tests in behat ui'
   options:
     _admin_route: TRUE
 behat_ui.settings:
@@ -13,7 +13,7 @@ behat_ui.settings:
     _title: 'Behat UI'
     _form: \Drupal\behat_ui\Form\BehatUiSettings
   requirements:
-    _permission: 'administer site configuration'
+    _permission: 'administer behat ui settings'
   options:
     _admin_route: TRUE
 behat_ui.new:
@@ -22,7 +22,7 @@ behat_ui.new:
     _title: 'Create test'
     _form: \Drupal\behat_ui\Form\BehatUiNew
   requirements:
-    _permission: 'administer site configuration'
+    _permission: 'create tests with behat ui'
   options:
     _admin_route: TRUE
 behat_ui.behat_dl:
@@ -31,7 +31,7 @@ behat_ui.behat_dl:
     _title: 'Behat definition steps'
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::getDefinitionSteps'
   requirements:
-    _permission: 'administer site configuration'
+    _permission: 'create tests with behat ui'
   options:
     _admin_route: TRUE
 behat_ui.behat_di:
@@ -40,7 +40,7 @@ behat_ui.behat_di:
     _title: 'Behat definitions steps with extended info'
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::getDefinitionStepsWithInfo'
   requirements:
-    _permission: 'administer site configuration'
+    _permission: 'create tests with behat ui'
   options:
     _admin_route: TRUE
 behat_ui.status:
@@ -48,7 +48,7 @@ behat_ui.status:
   defaults:
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::getTestStatus'
   requirements:
-    _permission: 'administer site configuration'
+    _permission: 'run all tests in behat ui'
   options:
     _admin_route: TRUE
 behat_ui.autocomplete:
@@ -57,7 +57,7 @@ behat_ui.autocomplete:
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::autocompleteStep'
     _format: json
   requirements:
-    _permission: 'administer site configuration'
+    _permission: 'create tests with behat ui'
   options:
     _admin_route: TRUE
 behat_ui.kill:
@@ -65,7 +65,7 @@ behat_ui.kill:
   defaults:
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::kill'
   requirements:
-    _permission: 'administer site configuration'
+    _permission: 'run all tests in behat ui'
   options:
     _admin_route: TRUE
 behat_ui.download:
@@ -73,6 +73,6 @@ behat_ui.download:
   defaults:
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::download'
   requirements:
-    _permission: 'administer site configuration'
+    _permission: 'create tests with behat ui'
   options:
     _admin_route: TRUE

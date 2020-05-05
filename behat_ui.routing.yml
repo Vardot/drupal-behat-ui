@@ -48,7 +48,15 @@ behat_ui.status:
   defaults:
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::getTestStatus'
   requirements:
-    _permission: 'run all tests in behat ui'
+    _permission: 'run all tests in behat ui + create tests with behat ui'
+  options:
+    _admin_route: TRUE
+behat_ui.report:
+  path: '/behat-ui/report'
+  defaults:
+    _controller: '\Drupal\behat_ui\Controller\BehatUiController::getTestStatusReport'
+  requirements:
+    _permission: 'run all tests in behat ui + create tests with behat ui'
   options:
     _admin_route: TRUE
 behat_ui.autocomplete:

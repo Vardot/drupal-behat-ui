@@ -6,17 +6,18 @@ use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Component\Utility\Xss;
-use Drupal\Component\Utility\Html;
+use Drupal\Core\Url;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Default Behat Ui controller for the Behat Ui module.
  */
 class BehatUiController extends ControllerBase {
-
+  
   /**
-   * Get Behat test status.
+   * Get Behat test status report.
    */
-  public function getTestStatus() {
+  public function getTestStatusReport() {
     $running = FALSE;
     $config = \Drupal::config('behat_ui.settings');
 
@@ -45,6 +46,9 @@ class BehatUiController extends ControllerBase {
         if ($html_report && file_exists($html_report)) {
           $output = file_get_contents($html_report);
         }
+        else {
+          $output = $this->t('No HTML test report yet!');
+        }
       }
 
     }
@@ -58,8 +62,42 @@ class BehatUiController extends ControllerBase {
         if ($log_report && file_exists($log_report)) {
           $output = nl2br(htmlentities(file_get_contents($log_report)));
         }
+        else {
+          $output = $this->t('No Console log test report yet!');
+        }
       }
     }
+
+    $build = [
+      '#theme' => 'behat_ui_report',
+      '#output' => $output,
+      '#name' => "Behat UI report",
+      '#cache' => ['max-age' => 0],
+    ];
+    
+    $build_output = \Drupal::service('renderer')->renderRoot($build);
+    $response = new Response();
+    $response->setContent($build_output);
+    return $response;
+
+  }
+
+
+  /**
+   * Get Behat test status.
+   */
+  public function getTestStatus() {
+    $running = FALSE;
+
+    $tempstore = \Drupal::service('tempstore.private')->get('behat_ui');
+    $pid = $tempstore->get('behat_ui_pid');
+
+    if (isset($pid) && $this->processRunning($pid)) {
+      $running = TRUE;
+    }
+    
+    $report_url = new Url('behat_ui.report');
+    $output = '<iframe src="' . \Drupal::request()->getSchemeAndHttpHost() . $report_url->toString() . '" width="100%" height="100%"></iframe>';
 
     return new JsonResponse(['running' => $running, 'output' => $output]);
   }

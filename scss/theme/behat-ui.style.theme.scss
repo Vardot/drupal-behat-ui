@@ -1,13 +1,10 @@
 #behat-ui-output {
   display: block;
-  height: 600px;
-  overflow: auto;
-  padding: 1em;
+  height: 800px;
   margin-bottom: 1em;
-  font-size: 14px;
   border: 1px solid #333;
   background: #ffe;
-  
+
  * {
     font-size: 14px;
     font-family: sans-serif;
@@ -156,6 +153,10 @@
         padding: 0;
         margin: 3px 0;
 
+        .form-element--type-select {
+          font-weight: bolder;
+        }
+
         .form-type--textfield {
           width: 87%;
         }
@@ -168,8 +169,6 @@
      margin: 0;
     }
   }
-  
-
 
   .claro-autocomplete {
     margin: 0;

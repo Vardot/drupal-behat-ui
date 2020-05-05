@@ -42,3 +42,19 @@ function behat_ui_help($route_name, RouteMatchInterface $route_match) {
   }
 
 }
+
+
+function behat_ui_theme($existing, $type, $theme, $path) {
+
+  return [		
+    'behat_ui_report' => [
+      'render element' => 'children',
+      'template' => 'behat-ui-report',
+      'path' => $path . '/templates',
+      'variables' => [
+        'output' => t('No report yet'),
+      ],
+    ],
+  ];
+
+}

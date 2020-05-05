@@ -7,6 +7,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
+use Drupal\Core\File\FileSystemInterface;
+use Symfony\Component\Process\Process;
 
 /**
  *
@@ -239,6 +241,7 @@ class BehatUiNew extends FormBase {
     $behat_ui_behat_config_file = $config->get('behat_ui_behat_config_file');
     $behat_ui_behat_features_path = $config->get('behat_ui_behat_features_path');
 
+    $behat_ui_html_report = $config->get('behat_ui_html_report');
     $behat_ui_html_report_dir = $config->get('behat_ui_html_report_dir');
     $behat_ui_html_report_file = $config->get('behat_ui_html_report_file');
 
@@ -259,7 +262,44 @@ class BehatUiNew extends FormBase {
 
     // Run file.
     $test_file = $behat_ui_behat_features_path . '/' . $file_user_time . '.feature';
-    $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path $test_file --format pretty --out std --format html";
+    $message = \Drupal::messenger();
+    $command = '';
+
+      if ($behat_ui_html_report) {
+
+        if (isset($behat_ui_html_report_dir) && $behat_ui_html_report_dir != ''
+          && isset($behat_ui_html_report_file) && $behat_ui_html_report_file != '') {
+          
+          if (\Drupal::service('file_system')->prepareDirectory($behat_ui_html_report_dir, FileSystemInterface::CREATE_DIRECTORY)) {
+            $html_report_output_file = $behat_ui_html_report_dir . '/' . $behat_ui_html_report_file;
+            $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path  --config=$behat_ui_behat_config_file $test_file --format pretty --out std --format html";
+          }
+          else {
+            $message->addError($this->t('The HTML Output directory does not exists or is not writable.'));
+          }
+        }
+        else {
+          $message->addError($this->t('HTML report directory and file is not configured.'));
+        }
+
+      }
+      else {
+
+        if (isset($behat_ui_log_report_dir) && $behat_ui_log_report_dir != ''
+          && isset($behat_ui_log_report_file) && $behat_ui_log_report_file != '') {
+
+          if (\Drupal::service('file_system')->prepareDirectory($behat_ui_log_report_dir, FileSystemInterface::CREATE_DIRECTORY)) {
+            $log_report_output_file = $behat_ui_log_report_dir . '/' . $behat_ui_log_report_file;
+            $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file  $test_file --format pretty --out std > $log_report_output_file&";
+          }
+          else {
+            $message->addError($this->t('The Log Output directory does not exists or is not writable.'));
+          }
+        }
+        else {
+          $message->addError($this->t('The Log directory and file is not configured.')); 
+        }
+      }
    
     
     $output = shell_exec($command);
@@ -274,10 +314,12 @@ class BehatUiNew extends FormBase {
       unlink($file);
     }
 
+    $report_url = new Url('behat_ui.report');
+
     $form['behat_ui_output'] = [
       '#title' => $this->t('Tests output'),
       '#type' => 'markup',
-      '#markup' => Markup::create('<div id="behat-ui-output"' . file_get_contents($report_html_file_name_and_path) . '</div>'),
+      '#markup' => Markup::create('<div id="behat-ui-output"><iframe src="' . \Drupal::request()->getSchemeAndHttpHost() . $report_url->toString() . '" width="100%" height="100%"></iframe></div>'),
     ];
     return $form['behat_ui_output'];
   }

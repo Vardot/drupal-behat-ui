@@ -6,7 +6,6 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Symfony\Component\Process\Process;
-use Behat\Testwork\ServiceContainer\Configuration\ConfigurationLoader;
 
 /**
  *
@@ -216,53 +215,6 @@ class BehatUiRunTests extends FormBase {
       $isRunning = TRUE;
     }
     return $isRunning;
-  }
-
-  /**
-   * Load Behat Config.
-   *
-   * Adding support for the Symfony yaml parser so everything can be setup
-   * through Composer.
-   *
-   * @return array
-   *   Behat config.
-   */
-  public function loadBehatConfig() {
-
-    $behat_config = [];
-
-    $config = \Drupal::config('behat_ui.settings');
-
-    $behat_ui_behat_config_path = $config->get('behat_ui_behat_config_path');
-    $behat_ui_behat_bin_path = $config->get('behat_ui_behat_bin_path');
-    $behat_ui_autoload_path = $config->get('behat_ui_autoload_path');
-    $behat_ui_behat_config_file = $config->get('behat_ui_behat_config_file');
-
-    try {
-      if (is_file($autoload = $behat_ui_autoload_path)) {
-        require $autoload;
-      }
-      else {
-
-        $error_message = $this->t('You must set up the project dependencies, run the following commands:') . PHP_EOL .
-            'curl -s http://getcomposer.org/installer | php' . PHP_EOL .
-            'php composer.phar install' . PHP_EOL;
-
-        \Drupal::messenger()->addError($error_message);
-        \Drupal::logger('behat_ui')->notice($error_message, []);
-      }
-
-      $behat_config_factory = new ConfigurationLoader();
-      $behat_config_factory->setConfigurationFilePath($behat_ui_behat_config_path . '/' . $behat_ui_behat_config_file);
-      $behat_config = $behat_config_factory->loadConfiguration();
-
-    }
-    catch (ParseException $e) {
-      \Drupal::messenger()->addError(t('Extension yaml is not loaded. Could not parse behat.yml file.'));
-      $watchdog_message = $this->t('Could not parse Behat config file, check Composer libraries, file permissions and Behat config: Error = @error', ['@error' => $e]);
-      \Drupal::logger('behat_ui')->notice($watchdog_message, []);
-    }
-    return ($behat_config);
   }
 
 }

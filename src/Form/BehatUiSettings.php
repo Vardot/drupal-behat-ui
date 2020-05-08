@@ -229,7 +229,9 @@ class BehatUiSettings extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this->config('behat_ui.settings');
     foreach ($form_state->getValues() as $key => $value) {
-      $config->set($key, $value);
+      if (strpos($key, 'behat_ui') !== FALSE) {
+        $config->set($key, $value);
+      }
     }
     $config->save();
     parent::submitForm($form, $form_state);

@@ -1,4 +1,4 @@
-behat_ui_behat_bin_path: 'bin/behat'
+behat_ui_behat_bin_path: 'php ./bin/behat'
 behat_ui_behat_config_path: '.'
 behat_ui_behat_config_file: 'behat.yml'
 behat_ui_behat_features_path: 'tests/features'
@@ -6,7 +6,7 @@ behat_ui_autoload_path: '../../../vendor/autoload.php'
 behat_ui_html_report: true
 behat_ui_html_report_dir: 'tests/reports/'
 behat_ui_html_report_file: 'index.html'
-behat_ui_behat_tags: 'javascript|Selenium + JavaScript\r\napi|Drupal API\r\nlocal|Local\r\ndevelopment|Development\r\nstaging|Staging and testing\r\nproduction|Production\r\ninit|Initialization\r\ncleanup|Cleanup'
+behat_ui_behat_tags: "javascript|Selenium + JavaScript\r\napi|Drupal API\r\nlocal|Local\r\ndevelopment|Development\r\nstaging|Staging and testing\r\nproduction|Production\r\ninit|Initialization\r\ncleanup|Cleanup"
 behat_ui_logs_report_dir: 'tests/logs/'
 behat_ui_logs_report_file: 'bethat-ui-test.log'
 behat_ui_http_user: ''

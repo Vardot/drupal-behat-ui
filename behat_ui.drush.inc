@@ -5,6 +5,8 @@
  * Behat ui drush commands.
  */
 
+use Drush\Drush;
+
 /**
  * Implements hook_drush_command().
  */
@@ -77,14 +79,14 @@ function drush_behat_ui() {
       $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file $behat_ui_behat_features_path --format pretty --out std > $log_report_output_file";
     }
     else {
-      drush_print(t('The Log Output directory does not exists or is not writable.'));
+      Drush::output()->writeln(dt('The Log Output directory does not exists or is not writable.'));
     }
   }
   else {
-    drush_print(t('The Log directory and file is not configured.'));
+    Drush::output()->writeln(dt('The Log directory and file is not configured.'));
   }
 
   $output = shell_exec($command);
-  drush_print($output);
-  drush_print(file_get_contents($log_report_output_file));
+  Drush::output()->writeln($output);
+  Drush::output()->writeln(file_get_contents($log_report_output_file));
 }

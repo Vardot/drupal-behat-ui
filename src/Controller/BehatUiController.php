@@ -3,45 +3,107 @@
 namespace Drupal\behat_ui\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Url;
+use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\TempStore\PrivateTempStoreFactory;
+use Drupal\Core\Render\RendererInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Default Behat Ui controller for the Behat Ui module.
  */
 class BehatUiController extends ControllerBase {
-  
+
+  /**
+   * The config factory service.
+   *
+   * @var \Drupal\Core\Config\ConfigFactory
+   */
+  protected $configFactory;
+
+  /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
+
+  /**
+   * The current request.
+   *
+   * @var \Symfony\Component\HttpFoundation\Request
+   */
+  protected $currentRequest;
+
+  /**
+   * The tempstore object.
+   *
+   * @var \Drupal\Core\TempStore\PrivateTempStoreFactory
+   */
+  protected $tempStore;
+
+  /**
+   * The renderer.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
+   * Constructs a BehatUIController object.
+   *
+   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   *   The config factory service.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger service.
+   * @param \Symfony\Component\HttpFoundation\Request $current_request
+   *   The current request.
+   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
+   *   The tempstore factory.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer.
+   */
+  public function __construct(ConfigFactory $config_factory, MessengerInterface $messenger, Request $current_request, PrivateTempStoreFactory $temp_store_factory, RendererInterface $renderer) {
+    $this->configFactory = $config_factory;
+    $this->messenger = $messenger;
+    $this->currentRequest = $current_request;
+    $this->tempStore = $temp_store_factory;
+    $this->renderer = $renderer;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('messenger'),
+      $container->get('request_stack')->getCurrentRequest(),
+      $container->get('tempstore.private'),
+      $container->get('renderer')
+    );
+  }
+
   /**
    * Get Behat test status report.
    */
   public function getTestStatusReport() {
-    $running = FALSE;
-    $config = \Drupal::config('behat_ui.settings');
-
-    $behat_ui_html_report_dir = $config->get('behat_ui_html_report_dir');
-    $behat_ui_html_report_file = $config->get('behat_ui_html_report_file');
-
-    $behat_ui_log_report_dir = $config->get('behat_ui_log_report_dir');
-    $behat_ui_log_report_file = $config->get('behat_ui_log_report_file');
+    $config = $this->configFactory->getEditable('behat_ui.settings');
 
     $behat_ui_html_report = $config->get('behat_ui_html_report');
-
-    $tempstore = \Drupal::service('tempstore.private')->get('behat_ui');
-    $pid = $tempstore->get('behat_ui_pid');
-
-    if (isset($pid) && $this->processRunning($pid)) {
-      $running = TRUE;
-    }
+    $behat_ui_html_report_dir = $config->get('behat_ui_html_report_dir');
+    $behat_ui_log_report_dir = $config->get('behat_ui_log_report_dir');
 
     $output = '';
     if ($behat_ui_html_report) {
-      if (isset($behat_ui_html_report_dir) && $behat_ui_html_report_dir != ''
-        && isset($behat_ui_html_report_file) && $behat_ui_html_report_file != '') {
+      if (isset($behat_ui_html_report_dir) && $behat_ui_html_report_dir != '') {
 
-        $html_report = $behat_ui_html_report_dir . '/' . $behat_ui_html_report_file;
+        $html_report = $behat_ui_html_report_dir . '/index.html';
 
         if ($html_report && file_exists($html_report)) {
           $output = file_get_contents($html_report);
@@ -54,10 +116,9 @@ class BehatUiController extends ControllerBase {
     }
     else {
 
-      if (isset($behat_ui_log_report_dir) && $behat_ui_log_report_dir != ''
-        && isset($behat_ui_log_report_file) && $behat_ui_log_report_file != '') {
+      if (isset($behat_ui_log_report_dir) && $behat_ui_log_report_dir != '') {
 
-        $log_report = $behat_ui_log_report_dir . '/' . $behat_ui_log_report_file;
+        $log_report = $behat_ui_log_report_dir . '/bethat-ui-test.log';
 
         if ($log_report && file_exists($log_report)) {
           $output = nl2br(htmlentities(file_get_contents($log_report)));
@@ -74,14 +135,13 @@ class BehatUiController extends ControllerBase {
       '#name' => "Behat UI report",
       '#cache' => ['max-age' => 0],
     ];
-    
-    $build_output = \Drupal::service('renderer')->renderRoot($build);
+
+    $build_output = $this->renderer->renderRoot($build);
     $response = new Response();
     $response->setContent($build_output);
     return $response;
 
   }
-
 
   /**
    * Get Behat test status.
@@ -89,15 +149,15 @@ class BehatUiController extends ControllerBase {
   public function getTestStatus() {
     $running = FALSE;
 
-    $tempstore = \Drupal::service('tempstore.private')->get('behat_ui');
-    $pid = $tempstore->get('behat_ui_pid');
+    $beaht_ui_process_collection = $this->tempStore->get('behat_ui.process_collection');
+    $pid = $beaht_ui_process_collection->get('behat_ui_pid');
 
     if (isset($pid) && $this->processRunning($pid)) {
       $running = TRUE;
     }
-    
+
     $report_url = new Url('behat_ui.report');
-    $output = '<iframe src="' . \Drupal::request()->getSchemeAndHttpHost() . $report_url->toString() . '" width="100%" height="100%"></iframe>';
+    $output = '<iframe src="' . $this->currentRequest->getSchemeAndHttpHost() . $report_url->toString() . '" width="100%" height="100%"></iframe>';
 
     return new JsonResponse(['running' => $running, 'output' => $output]);
   }
@@ -133,13 +193,13 @@ class BehatUiController extends ControllerBase {
    */
   public function kill() {
     $response = FALSE;
-    $tempstore = \Drupal::service('tempstore.private')->get('behat_ui');
-    $pid = $tempstore->get('behat_ui_pid');
+    $beaht_ui_process_collection = $this->tempStore->get('behat_ui.process_collection');
+    $pid = $beaht_ui_process_collection->get('behat_ui_pid');
 
     if ($pid) {
       try {
         $response = posix_kill($pid, SIGKILL);
-        $tempstore->delete('behat_ui_pid');
+        $beaht_ui_process_collection->delete('behat_ui_pid');
       }
       catch (Exception $e) {
         $response = FALSE;
@@ -153,38 +213,34 @@ class BehatUiController extends ControllerBase {
    */
   public function download($format) {
 
-    $config = \Drupal::config('behat_ui.settings');
+    $config = $this->configFactory->getEditable('behat_ui.settings');
 
     if (($format === 'html' || $format === 'txt')) {
 
       $headers = [
         'Content-Type' => 'text/x-behat',
         'Content-Disposition' => 'attachment; filename="behat_ui_output.' . $format . '"',
-        'Content-Length' => filesize($output),
       ];
+
       foreach ($headers as $key => $value) {
         drupal_add_http_header($key, $value);
       }
-      if ($format === 'html') {
 
+      if ($format === 'html') {
         $behat_ui_html_report_dir = $config->get('behat_ui_html_report_dir');
-        $behat_ui_html_report_file = $config->get('behat_ui_html_report_file');
-        $output = $behat_ui_html_report_dir . '/' . $behat_ui_html_report_file;
+        $output = $behat_ui_html_report_dir . '/index.html';
         readfile($output);
       }
       elseif ($format === 'txt') {
         drupal_add_http_header('Connection', 'close');
-
         $behat_ui_log_report_dir = $config->get('behat_ui_log_report_dir');
-        $behat_ui_log_report_file = $config->get('behat_ui_log_report_file');
-
-        $output = $behat_ui_log_report_dir . '/' . $behat_ui_log_report_file;
+        $output = $behat_ui_log_report_dir . '/bethat-ui-test.log';
         $plain = file_get_contents($output);
         echo drupal_html_to_text($plain);
       }
     }
     else {
-      \Drupal::messenger()->addError($this->t('Output file not found. Please run the tests again in order to generate it.'));
+      $this->messenger->addError($this->t('Output file not found. Please run the tests again in order to generate it.'));
       drupal_goto('behat_ui.run_tests');
     }
   }
@@ -194,14 +250,14 @@ class BehatUiController extends ControllerBase {
    */
   public function getAutocompleteDefinitionSteps() {
 
-    $config = \Drupal::config('behat_ui.settings');
+    $config = $this->configFactory->getEditable('behat_ui.settings');
     $behat_bin = $config->get('behat_ui_behat_bin_path');
     $behat_config_path = $config->get('behat_ui_behat_config_path');
 
-    $cmd = "cd $behat_config_path; $behat_bin -dl | sed 's/^\s*//g'";
-    $output = shell_exec($cmd);
+    $command = "cd $behat_config_path; $behat_bin -dl | sed 's/^\s*//g'";
+    $output = shell_exec($command);
     $output = nl2br(htmlentities($output));
-    
+
     $output = str_replace('default |', '', $output);
     $output = str_replace('Given', '', $output);
     $output = str_replace('When', '', $output);
@@ -218,7 +274,7 @@ class BehatUiController extends ControllerBase {
    */
   public function getDefinitionSteps() {
 
-    $config = \Drupal::config('behat_ui.settings');
+    $config = $this->configFactory->getEditable('behat_ui.settings');
     $behat_bin = $config->get('behat_ui_behat_bin_path');
     $behat_config_path = $config->get('behat_ui_behat_config_path');
 
@@ -237,12 +293,12 @@ class BehatUiController extends ControllerBase {
    */
   public function getDefinitionStepsWithInfo() {
 
-    $config = \Drupal::config('behat_ui.settings');
+    $config = $this->configFactory->getEditable('behat_ui.settings');
     $behat_bin = $config->get('behat_ui_behat_bin_path');
     $behat_config_path = $config->get('behat_ui_behat_config_path');
 
-    $cmd = "cd $behat_config_path; $behat_bin -di";
-    $output = shell_exec($cmd);
+    $command = "cd $behat_config_path; $behat_bin -di";
+    $output = shell_exec($command);
     $output = nl2br(htmlentities($output));
 
     $build = [
@@ -274,11 +330,13 @@ class BehatUiController extends ControllerBase {
   }
 
   /**
-   * Helper function to check if a process with given PID is running or not.
+   * Helper function to check if a process with a given PID is running or not.
    *
-   * @param $pid
+   * @param string $pid
+   *   The Process ID.
    *
    * @return bool
+   *   The status of the process.
    */
   public function processRunning($pid) {
     $isRunning = FALSE;

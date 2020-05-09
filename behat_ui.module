@@ -6,7 +6,6 @@
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\File\FileSystemInterface;
 
 /**
  * Implements hook_help().
@@ -43,10 +42,12 @@ function behat_ui_help($route_name, RouteMatchInterface $route_match) {
 
 }
 
-
+/**
+ * Implements hook_theme().
+ */
 function behat_ui_theme($existing, $type, $theme, $path) {
 
-  return [		
+  return [
     'behat_ui_report' => [
       'render element' => 'children',
       'template' => 'behat-ui-report',

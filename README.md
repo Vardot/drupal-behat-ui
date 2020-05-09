@@ -58,5 +58,4 @@ Check the module on [Drupal.org](https://www.drupal.org/project/behat_ui).
 
 ## Sponsored
 * [Vardot](http://www.vardot.com).
-* [Webship](http://webship.org).
 * [Meedan](http://meedan.org).

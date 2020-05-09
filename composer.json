@@ -9,17 +9,12 @@
     {
       "name": "Vardot",
       "homepage": "https://www.drupal.org/vardot",
-      "role": "Maintaining the Drupal 8 version"
-    },
-    {
-      "name": "Webship",
-      "homepage": "https://www.drupal.org/webship",
-      "role": "Volunteer contributions"
+      "role": "Maintaining Drupal 8/9 module"
     },
     {
       "name": "Meedan",
       "homepage": "https://www.drupal.org/meedan",
-      "role": "Sponsorship for the Drupal 7 version"
+      "role": "Sponsorship Drupal 7 module"
     }
   ],
   "support": {
@@ -33,10 +28,6 @@
     }
   },
   "require": {
-    "composer/installers": "~1.0",
-    "oomphinc/composer-installers-extender": "~1.0",
-    "cweagans/composer-patches": "~1.0",
-    "drupal/drupal-library-installer-plugin": "^0.3",
     "drupal/core": "^8.8.0 || ~9.0.0",
     "behat/behat": "~3.0",
     "drupal/drupal-extension": "^3.2",
@@ -45,8 +36,6 @@
   "extra": {
     "branch-alias": {
       "dev-8.x-3.x": "8.3.x-dev"
-    },
-    "enable-patching": true,
-    "composer-exit-on-patch-failure": true
+    }
   }
 }

@@ -43,21 +43,48 @@ function behat_ui_drush_help($section) {
 function drush_behat_ui() {
   global $base_root;
 
-  $username = \Drupal::config('behat_ui.settings')->get('behat_ui_http_user');
-  $password = \Drupal::config('behat_ui.settings')->get('behat_ui_http_password');
+  $config = \Drupal::config('behat_ui.settings');
+
+  $behat_ui_behat_config_path = $config->get('behat_ui_behat_config_path');
+  $behat_ui_behat_features_path = $config->get('behat_ui_behat_features_path');
+
+  $behat_ui_log_report_dir = $config->get('behat_ui_log_report_dir');
+
+  $behat_ui_http_user = $config->get('behat_ui_http_user');
+  $behat_ui_http_password = $config->get('behat_ui_http_password');
+  $behat_ui_http_auth_headless_only = $config->get('behat_ui_http_auth_headless_only');
 
   $url = $base_root;
-  if (!empty($username) && !empty($password) && !\Drupal::config('behat_ui.settings')->get('behat_ui_http_auth_headless_only')) {
-    $url = preg_replace('/^(https?:\/\/)/', "$1$username:$password@", $url);
-    $url = preg_replace('/([^\/])$/', "$1/", $url);
+  if (isset($behat_ui_http_user)
+    && !empty($behat_ui_http_user)
+    && isset($behat_ui_http_password)
+    && !empty($behat_ui_http_password)
+    && isset($behat_ui_http_auth_headless_only)
+    && $behat_ui_http_auth_headless_only == TRUE) {
+
+    $basic_auth = "$behat_ui_http_user:$behat_ui_http_password@";
+    $url = preg_replace('/^(https?:\/\/)/', $basic_auth, $url);
   }
 
-  $behat_bin = _behat_ui_get_behat_bin_path();
-  $behat_config_path = _behat_ui_get_behat_config_path();
+  $behat_ui_behat_bin_path = $config->get('behat_ui_behat_bin_path');
+  $behat_ui_behat_config_file = $config->get('behat_ui_behat_config_path');
 
-  $tmp = file_directory_temp();
-  $cmd = "MINK_EXTENSION_PARAMS='base_url=$url' php $behat_bin";
-  $outfile = $tmp . '/behat-ui-' . time() . '.log';
-  exec(sprintf("cd $behat_config_path; %s > %s 2>&1", $cmd, $outfile));
-  drush_print(file_get_contents($outfile));
+  $command = '';
+  if (isset($behat_ui_log_report_dir) && $behat_ui_log_report_dir != '') {
+
+    if (\Drupal::service('file_system')->prepareDirectory($behat_ui_log_report_dir, FileSystemInterface::CREATE_DIRECTORY)) {
+      $log_report_output_file = $behat_ui_log_report_dir . '/bethat-ui-test.log';
+      $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file $behat_ui_behat_features_path --format pretty --out std > $log_report_output_file";
+    }
+    else {
+      drush_print(t('The Log Output directory does not exists or is not writable.'));
+    }
+  }
+  else {
+    drush_print(t('The Log directory and file is not configured.'));
+  }
+
+  $output = shell_exec($command);
+  drush_print($output);
+  drush_print(file_get_contents($log_report_output_file));
 }

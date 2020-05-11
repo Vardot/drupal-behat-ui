@@ -31,8 +31,8 @@ class BehatUiSettings extends ConfigFormBase {
     $config = $this->config('behat_ui.settings');
 
     $form['behat_ui_behat_config_path'] = [
-      '#title' => $this->t('Behat configuration path'),
-      '#description' => $this->t('Directory path for Behat configuration. Do not include behat.yml, No trailing slash at the end'),
+      '#title' => $this->t('Behat configuration directory path'),
+      '#description' => $this->t('Directory path for Behat configuration. This is where the <em>behat.yml</em> file lives. Do not include the <em>behat.yml</em> file and no trailing slash at the end.'),
       '#type' => 'textfield',
       '#default_value' => $config->get('behat_ui_behat_config_path'),
       '#prefix' => '<div class="layout-row clearfix">
@@ -43,9 +43,9 @@ class BehatUiSettings extends ConfigFormBase {
     ];
 
     $form['behat_ui_behat_bin_path'] = [
-      '#title' => $this->t('Behat binary command path'),
-      '#description' => $this->t('Absolute or relative to the path below.<br />
-        <b>for example:</b><br />
+      '#title' => $this->t('Behat executable command path'),
+      '#description' => $this->t('An absolute path, or a relative path based on the Behat configuration directory path above.<br />
+        <b>Sometimes you will need to include the php executable. For example:</b><br />
         <ul>
           <li>bin/behat</li>
           <li>php ./bin/behat</li>
@@ -60,8 +60,8 @@ class BehatUiSettings extends ConfigFormBase {
 
     $form['behat_ui_behat_config_file'] = [
       '#title' => $this->t('Behat configuration file name'),
-      '#description' => $this->t('behat.yml other names like behat-install.yml, which located in the Behat configuration path.<br />
-              <b>for Example:</b>
+      '#description' => $this->t('The Behat configuration file, in the Behat configuration directory path. Usually <em>behat.yml</em>.<br />
+              <b>Examples:</b>
               <ul>
                 <li>behat.yml</li>
                 <li>behat.devshop.yml</li>
@@ -75,26 +75,22 @@ class BehatUiSettings extends ConfigFormBase {
     ];
 
     $form['behat_ui_behat_features_path'] = [
-      '#title' => $this->t('Behat Features path'),
-      '#description' => $this->t('Directory path for featurs to run. No trailing slash at the end<br />
-              <b>for Example:</b>
+      '#title' => $this->t('Behat features directory path'),
+      '#description' => $this->t('The directory path that has the Gherkin script files with <em>.feature</em> extension. The path is relative to the Behat configuration directory path. Do not include trailing slash at the end.<br />
+              <b>Examples:</b>
               <ul>
+                <li>features</li>
                 <li>tests/features</li>
-                <li>tests/features/varbase/step1-init-tests</li>
-                <li>tests/features/varbase/step2-apply-tests</li>
-                <li>tests/features/varbase/step3-cleanup-tests</li>
-              </ul><br />
-              <b>Create a folder in your tests/features/PROJECT_NAMAE</b><br />
-              <p>Add a file could be named all.feature, testing.feature</p> 
-              Then you could use that '),
+                <li>tests/features/commerce</li>
+              </ul>'),
       '#type' => 'textfield',
       '#default_value' => $config->get('behat_ui_behat_features_path'),
     ];
 
     $form['behat_ui_autoload_path'] = [
       '#title' => $this->t('Autoload path'),
-      '#description' => $this->t('The path for the autoload file.<br />
-        for <b>example:</b><br />
+      '#description' => $this->t('The path for the autoload file, relative to the Behat configuration directory path.<br />
+        <b>Examples:</b><br />
         <ul>
           <li>../../../vendor/autoload.php</li>
           <li>../../../web/autoload.php</li>
@@ -107,9 +103,9 @@ class BehatUiSettings extends ConfigFormBase {
 
     $form['behat_ui_html_report'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Enable HTML Report Format'),
+      '#title' => $this->t('Enable HTML report format'),
       '#default_value' => $config->get('behat_ui_html_report'),
-      '#description' => $this->t('Chack to enable generating HTML reports from your test results.'),
+      '#description' => $this->t('Check to enable generating an HTML report for your test results.'),
       '#prefix' => '<div class="panel">
           <h3 class="panel__title">' . $this->t('HTML formatted Report') . '</h3>
           <div class="panel__content">',
@@ -117,15 +113,15 @@ class BehatUiSettings extends ConfigFormBase {
 
     $form['behat_ui_html_report_dir'] = [
       '#title' => $this->t('HTML report directory'),
-      '#description' => $this->t('Add the full phiscial path for the tests/reports . No trailing slash at the end'),
+      '#description' => $this->t('The full absolute path for the tests/reports. No trailing slash at the end.'),
       '#type' => 'textfield',
       '#default_value' => $config->get('behat_ui_html_report_dir'),
       '#suffix' => '</div></div>',
     ];
 
     $form['behat_ui_log_report_dir'] = [
-      '#title' => $this->t('Console Log report directory'),
-      '#description' => $this->t('Add the full phiscial path for the tests/logs . No trailing slash at the end'),
+      '#title' => $this->t('Console log report directory'),
+      '#description' => $this->t('The full absolute path for the tests/logs. No trailing slash at the end'),
       '#type' => 'textfield',
       '#default_value' => $config->get('behat_ui_log_report_dir'),
       '#prefix' => '<div class="panel">
@@ -135,8 +131,8 @@ class BehatUiSettings extends ConfigFormBase {
     ];
 
     $form['behat_ui_http_user'] = [
-      '#title' => $this->t('HTTP Authentication User'),
-      '#description' => $this->t('User name for the basic authentication for the targeted site.'),
+      '#title' => $this->t('HTTP authentication user'),
+      '#description' => $this->t('Username for the basic authentication for the targeted site.'),
       '#type' => 'textfield',
       '#default_value' => $config->get('behat_ui_http_user'),
       '#prefix' => '<div class="layout-column layout-column--half">
@@ -146,8 +142,8 @@ class BehatUiSettings extends ConfigFormBase {
     ];
 
     $form['behat_ui_http_password'] = [
-      '#title' => $this->t('HTTP Authentication Password'),
-      '#description' => $this->t('Basic authentication password for the targetted site.'),
+      '#title' => $this->t('HTTP authentication password'),
+      '#description' => $this->t('Password for the basic authentication for the targeted site.'),
       '#type' => 'password',
       '#default_value' => $config->get('behat_ui_http_password'),
       '#suffix' => '</div></div>',
@@ -164,19 +160,19 @@ class BehatUiSettings extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Needs a real browser'),
       '#default_value' => $config->get('behat_ui_needs_browser'),
-      '#description' => $this->t('Check this if this test needs a real browser driver using Selenium, which supports JavaScript, in order to perform actions that happen without reloading the page.'),
+      '#description' => $this->t('Check this if this test needs a real browser driver using Selenium - which supports JavaScript - in order to perform actions that happen without reloading the page.'),
     ];
 
     $form['behat_ui_save_user_testing_features'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Save user testing features'),
       '#default_value' => $config->get('behat_ui_save_user_testing_features'),
-      '#description' => $this->t('Check if you want to save user testing features in the Behat Features path.'),
+      '#description' => $this->t('Check if you want to save user testing features in the Behat features path.'),
     ];
 
     $form['behat_ui_behat_tags'] = [
       '#type' => 'textarea',
-      '#title' => $this->t('List of aviabled behat tags to pass to the Run tests to limit scenarios.'),
+      '#title' => $this->t('List of available Behat tags to pass to the run tests to limit scenarios.'),
       '#default_value' => $config->get('behat_ui_behat_tags'),
       '#cols' => 60,
       '#rows' => 10,

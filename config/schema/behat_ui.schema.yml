@@ -2,21 +2,18 @@ behat_ui.settings:
   type: mapping
   label: Settings
   mapping:
-    behat_ui_behat_bin_path:
-      type: string
-      label: 'Behat binary command path'
     behat_ui_behat_config_path:
       type: string
       label: 'Behat configuration path'
+    behat_ui_behat_bin_path:
+      type: string
+      label: 'Behat binary command path'
     behat_ui_behat_config_file:
       type: string
       label: 'Behat configuration file name'
     behat_ui_behat_features_path:
       type: string
-      label: 'Behat Features path'
-    behat_ui_behat_tags:
-      type: string
-      label: 'Behat Tags' 
+      label: 'Behat Features path' 
     behat_ui_autoload_path:
       type: string
       label: 'Vendor autoload path'
@@ -44,3 +41,6 @@ behat_ui.settings:
     behat_ui_needs_browser:
       type: boolean
       label: 'Needs a real browser'
+    behat_ui_behat_tags:
+      type: string
+      label: 'Behat Tags'

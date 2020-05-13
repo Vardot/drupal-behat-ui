@@ -149,7 +149,7 @@ class BehatUiController extends ControllerBase {
   public function getTestStatus() {
     $running = FALSE;
 
-    $beaht_ui_process_collection = $this->tempStore->get('behat_ui.process_collection');
+    $beaht_ui_process_collection = $this->tempStore->get('behat_ui');
     $pid = $beaht_ui_process_collection->get('behat_ui_pid');
 
     if (isset($pid) && $this->processRunning($pid)) {
@@ -157,9 +157,9 @@ class BehatUiController extends ControllerBase {
     }
 
     $report_url = new Url('behat_ui.report');
-    $output = '<iframe src="' . $this->currentRequest->getSchemeAndHttpHost() . $report_url->toString() . '" width="100%" height="100%"></iframe>';
+    $output = '<iframe id="behat-ui-output-iframe" src="' . $this->currentRequest->getSchemeAndHttpHost() . $report_url->toString() . '" width="100%" height="100%"></iframe>';
 
-    return new JsonResponse(['running' => $running, 'output' => $output]);
+    return new JsonResponse(['running' => $running, 'pid' => $pid, 'output' => $output]);
   }
 
   /**
@@ -193,7 +193,7 @@ class BehatUiController extends ControllerBase {
    */
   public function kill() {
     $response = FALSE;
-    $beaht_ui_process_collection = $this->tempStore->get('behat_ui.process_collection');
+    $beaht_ui_process_collection = $this->tempStore->get('behat_ui');
     $pid = $beaht_ui_process_collection->get('behat_ui_pid');
 
     if ($pid) {
@@ -340,10 +340,16 @@ class BehatUiController extends ControllerBase {
    */
   public function processRunning($pid) {
     $isRunning = FALSE;
-    if (posix_kill(intval($pid), 0)) {
+    if (strncasecmp(PHP_OS, "win", 3) == 0) {
+      $out = [];
+      exec("TASKLIST /FO LIST /FI \"PID eq $pid\"", $out);
+      if(count($out) > 1) {
+        $isRunning = TRUE;
+      }
+    }
+    elseif(posix_kill(intval($pid), 0)) {
       $isRunning = TRUE;
     }
     return $isRunning;
   }
-
 }

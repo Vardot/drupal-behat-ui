@@ -23,7 +23,7 @@ behat_ui.settings:
     behat_ui_html_report_dir:
       type: string
       label: 'HTML report directory'
-    behat_ui_logs_report_dir:
+    behat_ui_log_report_dir:
       type: string
       label: 'Log report directory'
     behat_ui_http_user:

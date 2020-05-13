@@ -29,7 +29,8 @@
 
   var checkStatus = function() {
     var $stat = $('#behat-ui-status'),
-        $output = $('#behat-ui-output');
+        $output = $('#behat-ui-output'),
+        $output_iframe = $('behat-ui-output-iframe');
 
     $.ajax({
       url: drupalSettings.path.baseUrl + 'behat-ui/status?' + parseInt(Math.random() * 1000000000, 10),
@@ -39,9 +40,10 @@
 
         if (data.running) {
           $stat.addClass('running');
-          $stat.find('span').html(Drupal.t('Running <small><a href="#" id="behat-ui-kill">(kill)</a></small>'));
+          $stat.find('span').html(data.pid + Drupal.t(' Running <small><a href="#" id="behat-ui-kill">(kill)</a></small>'));
           killProcess();
           setTimeout(checkStatus, 10000);
+          $output_iframe[0].scrollBottom = $output[0].scrollHeight;
         }
         else {
           $stat.find('span').html(Drupal.t('Not running'));

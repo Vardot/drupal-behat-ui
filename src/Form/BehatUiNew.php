@@ -185,10 +185,19 @@ class BehatUiNew extends FormBase {
       '#description' => $this->t('Check this if this test needs a real browser, which supports JavaScript, in order to perform actions that happen without reloading the page.'),
     ];
 
+    // List of features in the selected behat features folder.
+    $features_options = $this->getExistingFeatures();
+    $features_default_value = 'default';
+    if (count($features_options) > 0) {
+      if (!isset($features_options['default'])) {
+        $features_default_value = array_key_first($features_default_value);
+      }
+    }
     $form['behat_ui_new_scenario']['behat_ui_feature'] = [
       '#type' => 'radios',
       '#title' => $this->t('Feature'),
-      '#options' => $this->getExistingFeatures(),
+      '#options' => $features_options,
+      '#default_value' => $features_default_value,
       '#suffix' => '</div></div></div>',
     ];
 
@@ -392,7 +401,7 @@ class BehatUiNew extends FormBase {
     $form['behat_ui_output'] = [
       '#title' => $this->t('Tests output'),
       '#type' => 'markup',
-      '#markup' => Markup::create('<div id="behat-ui-output"><iframe src="' . $this->currentRequest->getSchemeAndHttpHost() . $report_url->toString() . '" width="100%" height="100%"></iframe></div>'),
+      '#markup' => Markup::create('<div id="behat-ui-output"><iframe id="behat-ui-output-iframe"  src="' . $this->currentRequest->getSchemeAndHttpHost() . $report_url->toString() . '" width="100%" height="100%"></iframe></div>'),
     ];
 
     return $form['behat_ui_output'];

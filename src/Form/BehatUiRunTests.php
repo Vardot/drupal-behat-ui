@@ -109,7 +109,7 @@ class BehatUiRunTests extends FormBase {
     $behat_ui_html_report_dir = $config->get('behat_ui_html_report_dir');
     $behat_ui_log_report_dir = $config->get('behat_ui_log_report_dir');
 
-    $beaht_ui_process_collection = $this->tempStore->get('behat_ui.process_collection');
+    $beaht_ui_process_collection = $this->tempStore->get('behat_ui');
     $pid = $beaht_ui_process_collection->get('behat_ui_pid');
 
     $form['submit_button'] = [
@@ -120,14 +120,12 @@ class BehatUiRunTests extends FormBase {
     $label = $this->t('Not running');
     $class = '';
 
-    if (isset($pid)) {
-      if ($this->processRunning($pid)) {
-        $label = $this->t('Running <small><a href="#" id="behat-ui-kill">(kill)</a></small>');
-        $class = 'running';
-      }
-      else {
-        $beaht_ui_process_collection->delete('behat_ui_pid');
-      }
+    if (isset($pid) && $this->processRunning($pid)) {
+      $label = $pid . $this->t(' Running <small><a href="#" id="behat-ui-kill">(kill)</a></small>');
+      $class = 'running';
+    }
+    else {
+      $beaht_ui_process_collection->delete('behat_ui_pid');
     }
 
     $form['behat_ui_status'] = [
@@ -146,7 +144,7 @@ class BehatUiRunTests extends FormBase {
           $form['behat_ui_output'] = [
             '#title' => $this->t('Tests output'),
             '#type' => 'markup',
-            '#markup' => Markup::create('<div id="behat-ui-output"><iframe src="' . $this->currentRequest->getSchemeAndHttpHost() . $report_url->toString() . '" width="100%" height="100%"></iframe></div>'),
+            '#markup' => Markup::create('<div id="behat-ui-output"><iframe id="behat-ui-output-iframe" src="' . $this->currentRequest->getSchemeAndHttpHost() . $report_url->toString() . '" width="100%" height="100%"></iframe></div>'),
           ];
         }
         else {
@@ -206,7 +204,7 @@ class BehatUiRunTests extends FormBase {
     $behat_ui_html_report_dir = $config->get('behat_ui_html_report_dir');
     $behat_ui_log_report_dir = $config->get('behat_ui_log_report_dir');
 
-    $beaht_ui_tempstore_collection = $this->tempStore->get('behat_ui.process_collection');
+    $beaht_ui_tempstore_collection = $this->tempStore->get('behat_ui');
     $pid = $beaht_ui_tempstore_collection->get('behat_ui_pid');
 
     $command = '';
@@ -246,14 +244,25 @@ class BehatUiRunTests extends FormBase {
         }
       }
 
+      
       $process = new Process($command);
+      $process->setTimeout(360000);
       $process->enableOutput();
-      $process->start();
-      $new_pid = $process->getPid();
-      $beaht_ui_process_collection = $this->tempStore->get('behat_ui.process_collection');
-      $beaht_ui_process_collection->set('behat_ui_pid', $new_pid);
+      
+      try {
+        $process->start();
+        $new_pid = $process->getPid();
+        $this->messenger->addMessage($this->t("Started running tests using prcess ID: @pid",[ "@pid" => $new_pid]));
 
-      $this->messenger->addMessage($process->buildProcessMessage());
+        $beaht_ui_process_collection = $this->tempStore->get('behat_ui');
+        $beaht_ui_process_collection->set('behat_ui_pid', $new_pid);
+
+        if (!$process->isSuccessful()) {
+          $this->messenger->addMessage($process->getErrorOutput());
+        }
+      } catch (ProcessFailedException $exception) {
+        $this->messenger->addMessag($exception->getMessage());
+      }
 
     }
     else {
@@ -272,7 +281,14 @@ class BehatUiRunTests extends FormBase {
    */
   public function processRunning($pid) {
     $isRunning = FALSE;
-    if (posix_kill(intval($pid), 0)) {
+    if (strncasecmp(PHP_OS, "win", 3) == 0) {
+      $out = [];
+      exec("TASKLIST /FO LIST /FI \"PID eq $pid\"", $out);
+      if(count($out) > 1) {
+        $isRunning = TRUE;
+      }
+    }
+    elseif(posix_kill(intval($pid), 0)) {
       $isRunning = TRUE;
     }
     return $isRunning;

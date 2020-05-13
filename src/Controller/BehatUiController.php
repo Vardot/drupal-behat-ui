@@ -159,7 +159,11 @@ class BehatUiController extends ControllerBase {
     $report_url = new Url('behat_ui.report');
     $output = '<iframe id="behat-ui-output-iframe" src="' . $this->currentRequest->getSchemeAndHttpHost() . $report_url->toString() . '" width="100%" height="100%"></iframe>';
 
-    return new JsonResponse(['running' => $running, 'pid' => $pid, 'output' => $output]);
+    return new JsonResponse([
+      'running' => $running,
+      'pid' => $pid,
+      'output' => $output,
+    ]);
   }
 
   /**
@@ -343,13 +347,14 @@ class BehatUiController extends ControllerBase {
     if (strncasecmp(PHP_OS, "win", 3) == 0) {
       $out = [];
       exec("TASKLIST /FO LIST /FI \"PID eq $pid\"", $out);
-      if(count($out) > 1) {
+      if (count($out) > 1) {
         $isRunning = TRUE;
       }
     }
-    elseif(posix_kill(intval($pid), 0)) {
+    elseif (posix_kill(intval($pid), 0)) {
       $isRunning = TRUE;
     }
     return $isRunning;
   }
+
 }

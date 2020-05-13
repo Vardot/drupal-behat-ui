@@ -121,7 +121,7 @@ class BehatUiRunTests extends FormBase {
     $class = '';
 
     if (isset($pid) && $this->processRunning($pid)) {
-      $label = $pid . $this->t(' Running <small><a href="#" id="behat-ui-kill">(kill)</a></small>');
+      $label = $pid . ' ' . $this->t('Running <small><a href="#" id="behat-ui-kill">(kill)</a></small>');
       $class = 'running';
     }
     else {
@@ -244,15 +244,14 @@ class BehatUiRunTests extends FormBase {
         }
       }
 
-      
       $process = new Process($command);
       $process->setTimeout(360000);
       $process->enableOutput();
-      
+
       try {
         $process->start();
         $new_pid = $process->getPid();
-        $this->messenger->addMessage($this->t("Started running tests using prcess ID: @pid",[ "@pid" => $new_pid]));
+        $this->messenger->addMessage($this->t("Started running tests using prcess ID: @pid", ["@pid" => $new_pid]));
 
         $beaht_ui_process_collection = $this->tempStore->get('behat_ui');
         $beaht_ui_process_collection->set('behat_ui_pid', $new_pid);
@@ -260,7 +259,8 @@ class BehatUiRunTests extends FormBase {
         if (!$process->isSuccessful()) {
           $this->messenger->addMessage($process->getErrorOutput());
         }
-      } catch (ProcessFailedException $exception) {
+      }
+      catch (ProcessFailedException $exception) {
         $this->messenger->addMessag($exception->getMessage());
       }
 
@@ -284,11 +284,11 @@ class BehatUiRunTests extends FormBase {
     if (strncasecmp(PHP_OS, "win", 3) == 0) {
       $out = [];
       exec("TASKLIST /FO LIST /FI \"PID eq $pid\"", $out);
-      if(count($out) > 1) {
+      if (count($out) > 1) {
         $isRunning = TRUE;
       }
     }
-    elseif(posix_kill(intval($pid), 0)) {
+    elseif (posix_kill(intval($pid), 0)) {
       $isRunning = TRUE;
     }
     return $isRunning;

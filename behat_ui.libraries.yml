@@ -8,10 +8,16 @@ run-tests-scripts:
   js:
     js/behat-ui.run-tests.js: {}
   dependencies:
-     - core/drupal.ajax
+    - core/drupal
+    - core/drupal.ajax
+    - core/jquery
+    - core/jquery.once
 new-test-scripts:
   version: VERSION
   js:
     js/behat-ui.new-test.js: {}
   dependencies:
-     - core/drupal.ajax
+    - core/drupal
+    - core/drupal.ajax
+    - core/jquery
+    - core/jquery.once

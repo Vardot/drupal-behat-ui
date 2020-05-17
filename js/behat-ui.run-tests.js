@@ -1,65 +1,70 @@
 /**
  * @file
- * Jslint nomen: true, plusplus: true, todo: true, white: true, browser: true, indent: 2.
+ * Behaviors Behat UI run tests scripts.
  */
 
-(function ($, Drupal, window, document, undefined) {
+(function ($, _, Drupal, drupalSettings) {
+  "use strict";
+  
+  Drupal.behaviors.BehatUiRunTests = {
+    attach: function (context, settings) {
+      
 
-  var killProcess = function() {
-    $('#behat-ui-kill').click(function() {
-      $.ajax({
-        url: drupalSettings.path.baseUrl + 'behat-ui/kill?' + parseInt(Math.random() * 1000000000, 10),
-        dataType: 'json',
-        success: function (data) {
-          if (data.response) {
-            console.log(Drupal.t('Process killed'));
-            checkStatus();
+      var killProcess = function () {
+        $('#behat-ui-kill', context).click(function() {
+          $.ajax({
+            url: drupalSettings.path.baseUrl + 'behat-ui/kill?' + parseInt(Math.random() * 1000000000, 10),
+            dataType: 'json',
+            success: function (data) {
+              if (data.response) {
+                console.log(Drupal.t('Process killed'));
+                checkStatus();
+              }
+              else {
+                console.log(Drupal.t('Could not kill process'));
+              }
+            },
+            error: function (xhr, textStatus, error) {
+              console.log(Drupal.t('An error happened on trying to kill the process.'));
+            }
+          });
+          return false;
+        });
+      };
+
+      var checkStatus = function () {
+        var behat_ui_status = $('#behat-ui-status', context);
+        var behat_ui_output = $('#behat-ui-output', context);
+
+        $.ajax({
+          url: drupalSettings.path.baseUrl + 'behat-ui/status?' + parseInt(Math.random() * 1000000000, 10),
+          dataType: 'json',
+          success: function (data) {
+
+            behat_ui_status.removeClass('running');
+
+            if (data.running) {
+              behat_ui_status.addClass('running');
+              behat_ui_status.find('span').html(Drupal.t('Process:') + data.pid + ' ' + Drupal.t('Running <small><a href="#" id="behat-ui-kill">(kill)</a></small>'));
+              killProcess();
+              setTimeout(checkStatus, 10000);
+            }
+            else {
+              behat_ui_status.find('span').html(Drupal.t('Not running'));
+            }
+            
+            behat_ui_output.html(data.output);
+
+          },
+          error: function (xhr, textStatus, error) {
+            console.log(Drupal.t('An error happened on checking tests status.'));
+            setTimeout(checkStatus, 10000);
           }
-          else {
-            console.log(Drupal.t('Could not kill process'));
-          }
-        },
-        error: function (xhr, textStatus, error) {
-          console.log(Drupal.t('An error happened on trying to kill the process.'));
-        }
-      });
-      return false;
-    });
+        });
+      };
+
+      checkStatus();
+      killProcess();
+    }
   };
-
-  var checkStatus = function() {
-    var $stat = $('#behat-ui-status'),
-        $output = $('#behat-ui-output'),
-        $output_iframe = $('behat-ui-output-iframe');
-
-    $.ajax({
-      url: drupalSettings.path.baseUrl + 'behat-ui/status?' + parseInt(Math.random() * 1000000000, 10),
-      dataType: 'json',
-      success: function (data) {
-        $stat.removeClass('running');
-
-        if (data.running) {
-          $stat.addClass('running');
-          $stat.find('span').html(data.pid + Drupal.t(' Running <small><a href="#" id="behat-ui-kill">(kill)</a></small>'));
-          killProcess();
-          setTimeout(checkStatus, 10000);
-          $output_iframe[0].scrollBottom = $output[0].scrollHeight;
-        }
-        else {
-          $stat.find('span').html(Drupal.t('Not running'));
-        }
-
-        $output.html(data.output);
-        $output[0].scrollTop = $output[0].scrollHeight;
-      },
-      error: function (xhr, textStatus, error) {
-        console.log(Drupal.t('An error happened on checking tests status.'));
-        setTimeout(checkStatus, 10000);
-      }
-    });
-  };
-
-  checkStatus();
-  killProcess();
-
-})(jQuery, Drupal, this, this.document);
+})(window.jQuery, window._, window.Drupal, window.drupalSettings);

@@ -147,23 +147,30 @@ class BehatUiController extends ControllerBase {
    * Get Behat test status.
    */
   public function getTestStatus() {
-    $running = FALSE;
-
-    $beaht_ui_process_collection = $this->tempStore->get('behat_ui');
-    $pid = $beaht_ui_process_collection->get('behat_ui_pid');
-
-    if (isset($pid) && $this->processRunning($pid)) {
-      $running = TRUE;
-    }
 
     $report_url = new Url('behat_ui.report');
     $output = '<iframe id="behat-ui-output-iframe" src="' . $this->currentRequest->getSchemeAndHttpHost() . $report_url->toString() . '" width="100%" height="100%"></iframe>';
 
-    return new JsonResponse([
-      'running' => $running,
-      'pid' => $pid,
-      'output' => $output,
-    ]);
+    $beaht_ui_tempstore_collection = $this->tempStore->get('behat_ui');
+    $pid = $beaht_ui_tempstore_collection->get('behat_ui_pid');
+
+    if ($pid && posix_kill(intval($pid), 0)) {
+
+      return new JsonResponse([
+        'running' => TRUE,
+        'pid' => $pid,
+        'output' => $output,
+      ]);
+    }
+    else {
+
+      return new JsonResponse([
+        'running' => FALSE,
+        'pid' => '',
+        'output' => $output,
+      ]);
+    }
+
   }
 
   /**
@@ -197,13 +204,13 @@ class BehatUiController extends ControllerBase {
    */
   public function kill() {
     $response = FALSE;
-    $beaht_ui_process_collection = $this->tempStore->get('behat_ui');
-    $pid = $beaht_ui_process_collection->get('behat_ui_pid');
+    $beaht_ui_tempstore_collection = $this->tempStore->get('behat_ui');
+    $pid = $beaht_ui_tempstore_collection->get('behat_ui_pid');
 
-    if ($pid) {
+    if ($pid && posix_kill(intval($pid), 0)) {
       try {
         $response = posix_kill($pid, SIGKILL);
-        $beaht_ui_process_collection->delete('behat_ui_pid');
+        $beaht_ui_tempstore_collection->delete('behat_ui_pid');
       }
       catch (Exception $e) {
         $response = FALSE;
@@ -331,30 +338,6 @@ class BehatUiController extends ControllerBase {
     $formatedBehatSteps = $formatCodeBeginValue . str_replace('default |', $formatCodeEndBeginValue, $formatedBehatSteps);
 
     return $formatedBehatSteps;
-  }
-
-  /**
-   * Helper function to check if a process with a given PID is running or not.
-   *
-   * @param string $pid
-   *   The Process ID.
-   *
-   * @return bool
-   *   The status of the process.
-   */
-  public function processRunning($pid) {
-    $isRunning = FALSE;
-    if (strncasecmp(PHP_OS, "win", 3) == 0) {
-      $out = [];
-      exec("TASKLIST /FO LIST /FI \"PID eq $pid\"", $out);
-      if (count($out) > 1) {
-        $isRunning = TRUE;
-      }
-    }
-    elseif (posix_kill(intval($pid), 0)) {
-      $isRunning = TRUE;
-    }
-    return $isRunning;
   }
 
 }

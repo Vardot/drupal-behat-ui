@@ -1,125 +1,133 @@
 /**
  * @file
- * Jslint nomen: true, plusplus: true, todo: true, white: true, browser: true, indent: 2.
+ * Behaviors Behat UI New test scripts.
  */
 
-(function ($, Drupal, window, document, undefined) {
-  // Keep cursor in position after updating textarea
-  // Reference: http://stackoverflow.com/questions/13949059/persisting-the-changes-of-range-objects-after-selection-in-html/13950376#13950376
-  var saveSelection, restoreSelection;
+(function ($, _, Drupal, drupalSettings) {
+  "use strict";
 
-  if (window.getSelection && document.createRange) {
-    saveSelection = function(containerEl) {
-      var range = window.getSelection().getRangeAt(0);
-      var preSelectionRange = range.cloneRange();
-      preSelectionRange.selectNodeContents(containerEl);
-      preSelectionRange.setEnd(range.startContainer, range.startOffset);
-      var start = preSelectionRange.toString().length;
+  Drupal.behaviors.BehatUiNewTest = {
+    attach: function (context, settings) {
 
-      return {
-        start: start,
-        end: start + range.toString().length
+      // Keep cursor in position after updating textarea
+      // Reference: http://stackoverflow.com/questions/13949059/persisting-the-changes-of-range-objects-after-selection-in-html/13950376#13950376
+      var saveSelection, restoreSelection;
+
+      if (window.getSelection && document.createRange) {
+        saveSelection = function(containerEl) {
+          var range = window.getSelection().getRangeAt(0);
+          var preSelectionRange = range.cloneRange();
+          preSelectionRange.selectNodeContents(containerEl);
+          preSelectionRange.setEnd(range.startContainer, range.startOffset);
+          var start = preSelectionRange.toString().length;
+
+          return {
+            start: start,
+            end: start + range.toString().length
+          };
+        };
+
+        restoreSelection = function(containerEl, savedSel) {
+          var charIndex = 0, range = document.createRange();
+          range.setStart(containerEl, 0);
+          range.collapse(true);
+          var nodeStack = [containerEl], node, foundStart = false, stop = false;
+
+          while (!stop && (node = nodeStack.pop())) {
+            if (node.nodeType == 3) {
+              var nextCharIndex = charIndex + node.length;
+              if (!foundStart && savedSel.start >= charIndex && savedSel.start <= nextCharIndex) {
+                range.setStart(node, savedSel.start - charIndex);
+                foundStart = true;
+              }
+              if (foundStart && savedSel.end >= charIndex && savedSel.end <= nextCharIndex) {
+                range.setEnd(node, savedSel.end - charIndex);
+                stop = true;
+              }
+              charIndex = nextCharIndex;
+            }
+            else {
+              var i = node.childNodes.length;
+              while (i--) {
+                nodeStack.push(node.childNodes[i]);
+              }
+            }
+          }
+
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }
+      else if (document.selection) {
+        saveSelection = function(containerEl) {
+          var selectedTextRange = document.selection.createRange();
+          var preSelectionTextRange = document.body.createTextRange();
+          preSelectionTextRange.moveToElementText(containerEl);
+          preSelectionTextRange.setEndPoint("EndToStart", selectedTextRange);
+          var start = preSelectionTextRange.text.length;
+
+          return {
+            start: start,
+            end: start + selectedTextRange.text.length
+          }
+        };
+
+        restoreSelection = function(containerEl, savedSel) {
+          var textRange = document.body.createTextRange();
+          textRange.moveToElementText(containerEl);
+          textRange.collapse(true);
+          textRange.moveEnd("character", savedSel.end);
+          textRange.moveStart("character", savedSel.start);
+          textRange.select();
+        };
+      }
+
+      // Replace step fields by rich text fields.
+      var syntaxHighlight = function(text) {
+        return text.replace(/((\([^\)]*\))|(( |(&nbsp;))[0-9]+( |(&nbsp;))))/g, '<span class=\'step-param\'>$1</span>')
+                   .replace(/"([a-zA-Z0-9\[\]_\-:\/\. ]+)"/g, '"<span class=\'step-param\'>$1</span>"')
+                   .replace(/([\|:])\|/g, '$1<br />|')
+                   .replace(/\|(.*)\|/, '<pre class="step-param">|$1|</pre>')
+                   .replace(/\|/g, '<span class="step-no-param">|</span>');
       };
-    };
 
-    restoreSelection = function(containerEl, savedSel) {
-      var charIndex = 0, range = document.createRange();
-      range.setStart(containerEl, 0);
-      range.collapse(true);
-      var nodeStack = [containerEl], node, foundStart = false, stop = false;
+      // Sort steps.
+      var sortfunction = function(link, direction) {
 
-      while (!stop && (node = nodeStack.pop())) {
-        if (node.nodeType == 3) {
-          var nextCharIndex = charIndex + node.length;
-          if (!foundStart && savedSel.start >= charIndex && savedSel.start <= nextCharIndex) {
-            range.setStart(node, savedSel.start - charIndex);
-            foundStart = true;
-          }
-          if (foundStart && savedSel.end >= charIndex && savedSel.end <= nextCharIndex) {
-            range.setEnd(node, savedSel.end - charIndex);
-            stop = true;
-          }
-          charIndex = nextCharIndex;
+        var appendfunction, selectfunction;
+
+        if (direction === 'up') {
+          appendfunction = 'before';
+          selectfunction = 'prev';
+        }
+        else if (direction === 'down') {
+          appendfunction = 'after';
+          selectfunction = 'next';
         }
         else {
-          var i = node.childNodes.length;
-          while (i--) {
-            nodeStack.push(node.childNodes[i]);
-          }
+          return false;
         }
-      }
 
-      var sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
+        var $current = $(link).closest('.form-wrapper'),
+            $other   = $current[selectfunction]('.form-wrapper');
+
+        if ($other.length) {
+          $other[appendfunction]($current);
+
+          // Rename fields, otherwise it won't make any difference when form is submitted.
+          var currenttextname = $current.find('.form-text').attr('name'),
+              currentselectname = $current.find('.form-select').attr('name');
+          $current.find('.form-text').attr('name', $other.find('.form-text').attr('name'));
+          $current.find('.form-select').attr('name', $other.find('.form-select').attr('name'));
+          $other.find('.form-text').attr('name', currenttextname);
+          $other.find('.form-select').attr('name', currentselectname);
+        }
+
+        return false;
+      };
+      
     }
-  }
-  else if (document.selection) {
-    saveSelection = function(containerEl) {
-      var selectedTextRange = document.selection.createRange();
-      var preSelectionTextRange = document.body.createTextRange();
-      preSelectionTextRange.moveToElementText(containerEl);
-      preSelectionTextRange.setEndPoint("EndToStart", selectedTextRange);
-      var start = preSelectionTextRange.text.length;
-
-      return {
-        start: start,
-        end: start + selectedTextRange.text.length
-      }
-    };
-
-    restoreSelection = function(containerEl, savedSel) {
-      var textRange = document.body.createTextRange();
-      textRange.moveToElementText(containerEl);
-      textRange.collapse(true);
-      textRange.moveEnd("character", savedSel.end);
-      textRange.moveStart("character", savedSel.start);
-      textRange.select();
-    };
-  }
-
-  // Replace step fields by rich text fields.
-  var syntaxHighlight = function(text) {
-    return text.replace(/((\([^\)]*\))|(( |(&nbsp;))[0-9]+( |(&nbsp;))))/g, '<span class=\'step-param\'>$1</span>')
-               .replace(/"([a-zA-Z0-9\[\]_\-:\/\. ]+)"/g, '"<span class=\'step-param\'>$1</span>"')
-               .replace(/([\|:])\|/g, '$1<br />|')
-               .replace(/\|(.*)\|/, '<pre class="step-param">|$1|</pre>')
-               .replace(/\|/g, '<span class="step-no-param">|</span>');
-  };
-
-  // Sort steps.
-  var sortfunction = function(link, direction) {
-
-    var appendfunction, selectfunction;
-
-    if (direction === 'up') {
-      appendfunction = 'before';
-      selectfunction = 'prev';
-    }
-    else if (direction === 'down') {
-      appendfunction = 'after';
-      selectfunction = 'next';
-    }
-    else {
-      return false;
-    }
-
-    var $current = $(link).closest('.form-wrapper'),
-        $other   = $current[selectfunction]('.form-wrapper');
-
-    if ($other.length) {
-      $other[appendfunction]($current);
-
-      // Rename fields, otherwise it won't make any difference when form is submitted.
-      var currenttextname = $current.find('.form-text').attr('name'),
-          currentselectname = $current.find('.form-select').attr('name');
-      $current.find('.form-text').attr('name', $other.find('.form-text').attr('name'));
-      $current.find('.form-select').attr('name', $other.find('.form-select').attr('name'));
-      $other.find('.form-text').attr('name', currenttextname);
-      $other.find('.form-select').attr('name', currentselectname);
-    }
-
-    return false;
   };
 
   Drupal.behaviors.enrichStepFields = {
@@ -175,4 +183,4 @@
     }
   };
 
-})(jQuery, Drupal, this, this.document);
+})(window.jQuery, window._, window.Drupal, window.drupalSettings);

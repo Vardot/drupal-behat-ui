@@ -124,7 +124,8 @@ class BehatUiNew extends FormBase {
 
     $form['behat_ui_new_scenario']['behat_ui_title'] = [
       '#type' => 'textfield',
-      '#title' => 'Title of this scenario',
+      '#maxlength' => 512,
+      '#title' => $this->t('Title of this scenario'),
       '#required' => TRUE,
     ];
 

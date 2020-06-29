@@ -124,6 +124,7 @@ class BehatUiNew extends FormBase {
 
     $form['behat_ui_new_scenario']['behat_ui_title'] = [
       '#type' => 'textfield',
+      '#maxlength' => 512,
       '#title' => 'Title of this scenario',
       '#required' => TRUE,
     ];
@@ -163,6 +164,7 @@ class BehatUiNew extends FormBase {
 
         $form['behat_ui_new_scenario']['behat_ui_steps'][$i]['step'] = [
           '#type' => 'textfield',
+          '#maxlength' => 512,
           '#autocomplete_route_name' => 'behat_ui.autocomplete',
         ];
       }

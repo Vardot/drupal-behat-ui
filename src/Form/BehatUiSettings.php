@@ -34,6 +34,7 @@ class BehatUiSettings extends ConfigFormBase {
       '#title' => $this->t('Behat configuration directory path'),
       '#description' => $this->t('Directory path for Behat configuration. This is where the <em>behat.yml</em> file lives. Do not include the <em>behat.yml</em> file and no trailing slash at the end.'),
       '#type' => 'textfield',
+      '#maxlength' => 512,
       '#default_value' => $config->get('behat_ui_behat_config_path'),
       '#prefix' => '<div class="layout-row clearfix">
           <div class="layout-column layout-column--half">
@@ -54,6 +55,7 @@ class BehatUiSettings extends ConfigFormBase {
           <li>/var/www/html/PROJECT_FOLDER/bin/behat</li>
         </ul>'),
       '#type' => 'textfield',
+      '#maxlength' => 512,
       '#default_value' => $config->get('behat_ui_behat_bin_path'),
       '#required' => TRUE,
     ];
@@ -71,6 +73,7 @@ class BehatUiSettings extends ConfigFormBase {
                 <li>behat.my-custom-config.yml</li>
               </ul>'),
       '#type' => 'textfield',
+      '#maxlength' => 512,
       '#default_value' => $config->get('behat_ui_behat_config_file'),
     ];
 
@@ -84,6 +87,7 @@ class BehatUiSettings extends ConfigFormBase {
                 <li>tests/features/commerce</li>
               </ul>'),
       '#type' => 'textfield',
+      '#maxlength' => 512,
       '#default_value' => $config->get('behat_ui_behat_features_path'),
     ];
 
@@ -97,6 +101,7 @@ class BehatUiSettings extends ConfigFormBase {
           <li>../../../docroot/autoload.php</li>
         </ul>'),
       '#type' => 'textfield',
+      '#maxlength' => 512,
       '#default_value' => $config->get('behat_ui_autoload_path'),
       '#suffix' => '</div></div>',
     ];
@@ -115,6 +120,7 @@ class BehatUiSettings extends ConfigFormBase {
       '#title' => $this->t('HTML report directory'),
       '#description' => $this->t('The full absolute path for the tests/reports. No trailing slash at the end.'),
       '#type' => 'textfield',
+      '#maxlength' => 512,
       '#default_value' => $config->get('behat_ui_html_report_dir'),
       '#suffix' => '</div></div>',
     ];
@@ -123,6 +129,7 @@ class BehatUiSettings extends ConfigFormBase {
       '#title' => $this->t('Console log report directory'),
       '#description' => $this->t('The full absolute path for the tests/logs. No trailing slash at the end'),
       '#type' => 'textfield',
+      '#maxlength' => 512,
       '#default_value' => $config->get('behat_ui_log_report_dir'),
       '#prefix' => '<div class="panel">
           <h3 class="panel__title">' . $this->t('Console Log formatted Report') . '</h3>
@@ -134,6 +141,7 @@ class BehatUiSettings extends ConfigFormBase {
       '#title' => $this->t('HTTP authentication user'),
       '#description' => $this->t('Username for the basic authentication for the targeted site.'),
       '#type' => 'textfield',
+      '#maxlength' => 512,
       '#default_value' => $config->get('behat_ui_http_user'),
       '#prefix' => '<div class="layout-column layout-column--half">
           <div class="panel">

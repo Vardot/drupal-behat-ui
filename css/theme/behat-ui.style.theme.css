@@ -136,17 +136,14 @@
 
 #behat-ui-new-steps .fieldset__wrapper .form-item .fieldset__wrapper {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-flex-wrap: nowrap;
+      -ms-flex-direction: row;
+          flex-direction: row;
   -ms-flex-wrap: nowrap;
-  flex-wrap: nowrap;
+      flex-wrap: nowrap;
   padding: 0;
   margin: 3px 0;
 }
@@ -162,10 +159,24 @@
 #behat-ui-new-steps .fieldset__wrapper fieldset {
   border: 0;
   -webkit-box-shadow: none;
-  box-shadow: none;
+          box-shadow: none;
   margin: 0;
 }
 
 #behat-ui-new-steps .claro-autocomplete {
   margin: 0;
+}
+
+.free-text-ace-editor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  tabindex: -1;
+}
+
+#free_text_ace_editor.ace_editor {
+  font-size: 1.2rem;
+  height: 770px;
+  border: 1px solid;
 }

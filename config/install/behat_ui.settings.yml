@@ -6,6 +6,7 @@ behat_ui_autoload_path: '../../../vendor/autoload.php'
 behat_ui_html_report: true
 behat_ui_html_report_dir: 'tests/reports'
 behat_ui_log_report_dir: 'tests/logs'
+behat_ui_editing_mode: 'guided_entry'
 behat_ui_http_user: ''
 behat_ui_http_password: ''
 behat_ui_http_auth_headless_only: true

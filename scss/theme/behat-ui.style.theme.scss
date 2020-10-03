@@ -174,3 +174,17 @@
     margin: 0;
   }
 }
+
+.free-text-ace-editor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  tabindex: -1;
+}
+
+#free_text_ace_editor.ace_editor {
+  font-size: 1.2rem;
+  height: 770px;
+  border: 1px solid;
+}

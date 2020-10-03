@@ -294,7 +294,7 @@ class BehatUiController extends ControllerBase {
     $output = nl2br(htmlentities($output));
 
     $build = [
-      '#markup' => $this->formatBehatSteps($output, '<p>', '</p><p class="messages messages--status color-success">'),
+      '#markup' => $this->formatBehatSteps($output, '<code>', '</code><br /><hr /><br /><code>'),
     ];
     return $build;
   }
@@ -321,7 +321,7 @@ class BehatUiController extends ControllerBase {
   /**
    * Format Behat Steps.
    */
-  public function formatBehatSteps($behatSteps, $formatCodeBeginValue = '<p><code>', $formatCodeEndBeginValue = '</code></p><p class="messages messages--status color-success"><code>') {
+  public function formatBehatSteps($behatSteps, $formatCodeBeginValue = '<code>', $formatCodeEndBeginValue = '</code><br /><hr /><code>') {
 
     $formatedBehatSteps = str_replace('Given ', '<b>Given</b> ', $behatSteps);
     $formatedBehatSteps = str_replace('When ', '<b>When</b> ', $formatedBehatSteps);

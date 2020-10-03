@@ -137,14 +137,34 @@ class BehatUiSettings extends ConfigFormBase {
       '#suffix' => '</div></div></div>',
     ];
 
+    $editing_mode_default_value = $config->get('behat_ui_editing_mode');
+    if (empty($editing_mode_default_value)) {
+      $editing_mode_default_value = 'guided_entry';
+    }
+
+    $editing_mode_options = [
+      'guided_entry' => $this->t('Guided entry'),
+      'free_text' => $this->t('Free text'),
+    ];
+
+    $form['behat_ui_editing_mode'] = [
+      '#type' => 'radios',
+      '#options' => $editing_mode_options,
+      '#default_value' => $editing_mode_default_value,
+      '#prefix' => '<div class="layout-column layout-column--half">
+          <div class="panel">
+            <h3 class="panel__title">' . $this->t('Editing Mode') . '</h3>
+            <div class="panel__content">',
+      '#suffix' => '</div></div>',
+    ];
+
     $form['behat_ui_http_user'] = [
       '#title' => $this->t('HTTP authentication user'),
       '#description' => $this->t('Username for the basic authentication for the targeted site.'),
       '#type' => 'textfield',
       '#maxlength' => 512,
       '#default_value' => $config->get('behat_ui_http_user'),
-      '#prefix' => '<div class="layout-column layout-column--half">
-          <div class="panel">
+      '#prefix' => '<div class="panel">
             <h3 class="panel__title">' . $this->t('HTTP Authentication') . '</h3>
             <div class="panel__content">',
     ];

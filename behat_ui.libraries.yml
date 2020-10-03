@@ -29,6 +29,8 @@ ace-editor:
     url: https://ace.c9.io
   js:
     //pagecdn.io/lib/ace/1.4.12/ace.js: { type: external, minified: true }
+    //pagecdn.io/lib/ace/1.4.12/ext-language_tools.js: { type: external, minified: true }
+    //pagecdn.io/lib/ace/1.4.12/ext-keybinding_menu.js: { type: external, minified: true }
     js/behat-ui.ace-editor.js: { }
   dependencies:
       - core/jquery.ui.resizable

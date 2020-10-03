@@ -339,5 +339,44 @@ class BehatUiController extends ControllerBase {
 
     return $formatedBehatSteps;
   }
+  
+  public function getDefinitionStepsJson() {
+
+    $config = $this->configFactory->getEditable('behat_ui.settings');
+    $behat_bin = $config->get('behat_ui_behat_bin_path');
+    $behat_config_path = $config->get('behat_ui_behat_config_path');
+
+    $cmd = "cd $behat_config_path; $behat_bin -dl | sed 's/^\s*//g'";
+    $output = shell_exec($cmd);
+    
+    $output = str_replace("default |", "", $output);
+    $output = str_replace("/^", "", $output);
+    $output = str_replace("$/", "", $output);
+
+    $output = str_replace('Given|', 'Given', $output);
+    $output = str_replace('When|', 'When', $output);
+    $output = str_replace('Then|', 'Then', $output);
+    $output = str_replace('And|', 'And', $output);
+    $output = str_replace('But|', 'But', $output);
+
+    $output = str_replace('Given', 'BEHAT_UI_DELIMITERGiven', $output);
+    $output = str_replace('When', 'BEHAT_UI_DELIMITERWhen', $output);
+    $output = str_replace('Then', 'BEHAT_UI_DELIMITERThen', $output);
+    $output = str_replace('And', 'BEHAT_UI_DELIMITERAnd', $output);
+    $output = str_replace('But', 'BEHAT_UI_DELIMITERBut', $output);
+    
+    $output = str_replace('Given', '', $output);
+    $output = str_replace('When', '', $output);
+    $output = str_replace('Then', '', $output);
+    $output = str_replace('And', '', $output);
+    $output = str_replace('But', '', $output);
+
+    $behatList = [];
+
+    $behatList += explode("BEHAT_UI_DELIMITER", $output);
+    sort($behatList);
+
+    return new JsonResponse($behatList);
+  }
 
 }

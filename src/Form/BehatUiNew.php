@@ -93,99 +93,148 @@ class BehatUiNew extends FormBase {
 
     $config = $this->configFactory->getEditable('behat_ui.settings');
 
-    $form['behat_ui_new_scenario'] = [
-      '#type' => 'markup',
-      '#markup' => '<div class="layout-row clearfix">'
-      . '  <div class="layout-column layout-column--half">'
-      . '    <div id="behat-ui-new-scenario" class="panel">'
-      . '      <h3 class="panel__title">' . $this->t('New scenario') . '</h3>'
-      . '      <div class="panel__content">',
-    ];
+    $behat_ui_editing_mode = $config->get('behat_ui_editing_mode');
+    if ($behat_ui_editing_mode == 'guided_entry') {
+      $form['behat_ui_new_scenario'] = [
+        '#type' => 'markup',
+        '#markup' => '<div class="layout-row clearfix">'
+        . '  <div class="layout-column layout-column--half">'
+        . '    <div id="behat-ui-new-scenario" class="panel">'
+        . '      <h3 class="panel__title">' . $this->t('New scenario') . '</h3>'
+        . '      <div class="panel__content">',
+      ];
 
-    $behat_ui_steps_link = new Url('behat_ui.behat_dl');
-    $form['behat_ui_new_scenario']['behat_ui_steps_link'] = [
-      '#type' => 'markup',
-      '#markup' => '<a class="button use-ajax"
-            data-dialog-options="{&quot;width&quot;:500}" 
-            data-dialog-renderer="off_canvas" 
-            data-dialog-type="dialog"
-            href="' . $this->currentRequest->getSchemeAndHttpHost() . $behat_ui_steps_link->toString() . '" >' . $this->t('Check available steps') . '</a>',
-    ];
+      $behat_ui_steps_link = new Url('behat_ui.behat_dl');
+      $form['behat_ui_new_scenario']['behat_ui_steps_link'] = [
+        '#type' => 'markup',
+        '#markup' => '<a class="button use-ajax"
+              data-dialog-options="{&quot;width&quot;:500}" 
+              data-dialog-renderer="off_canvas" 
+              data-dialog-type="dialog"
+              href="' . $this->currentRequest->getSchemeAndHttpHost() . $behat_ui_steps_link->toString() . '" >' . $this->t('Check available steps') . '</a>',
+      ];
 
-    $behat_ui_steps_link_with_info = new Url('behat_ui.behat_di');
-    $form['behat_ui_new_scenario']['behat_ui_steps_link_with_info'] = [
-      '#type' => 'markup',
-      '#markup' => '<a class="button use-ajax"
-            data-dialog-options="{&quot;width&quot;:500}" 
-            data-dialog-renderer="off_canvas" 
-            data-dialog-type="dialog"
-            href="' . $this->currentRequest->getSchemeAndHttpHost() . $behat_ui_steps_link_with_info->toString() . '" >' . $this->t('Full steps with info') . '</a>',
-    ];
+      $behat_ui_steps_link_with_info = new Url('behat_ui.behat_di');
+      $form['behat_ui_new_scenario']['behat_ui_steps_link_with_info'] = [
+        '#type' => 'markup',
+        '#markup' => '<a class="button use-ajax"
+              data-dialog-options="{&quot;width&quot;:500}" 
+              data-dialog-renderer="off_canvas" 
+              data-dialog-type="dialog"
+              href="' . $this->currentRequest->getSchemeAndHttpHost() . $behat_ui_steps_link_with_info->toString() . '" >' . $this->t('Full steps with info') . '</a>',
+      ];
 
-    $form['behat_ui_new_scenario']['behat_ui_title'] = [
-      '#type' => 'textfield',
-      '#maxlength' => 512,
-      '#title' => $this->t('Title of this scenario'),
-      '#required' => TRUE,
-    ];
+      $form['behat_ui_new_scenario']['behat_ui_title'] = [
+        '#type' => 'textfield',
+        '#maxlength' => 512,
+        '#title' => $this->t('Title of this scenario'),
+        '#required' => TRUE,
+      ];
 
-    $form['behat_ui_new_scenario']['behat_ui_steps'] = [
-      '#type' => 'fieldset',
-      '#title' => $this->t('Steps'),
-      '#collapsible' => TRUE,
-      '#collapsed' => FALSE,
-      '#tree' => TRUE,
-      '#prefix' => '<div id="behat-ui-new-steps">',
-      '#suffix' => '</div>',
-    ];
-    $storage = $form_state->getValues();
-    $stepCount = isset($storage['behat_ui_steps']) ? (count($storage['behat_ui_steps']) + 1) : 1;
-    if (isset($storage)) {
-      for ($i = 0; $i < $stepCount; $i++) {
-        $form['behat_ui_new_scenario']['behat_ui_steps'][$i] = [
-          '#type' => 'fieldset',
-          '#collapsible' => FALSE,
-          '#collapsed' => FALSE,
-          '#tree' => TRUE,
-        ];
+      $form['behat_ui_new_scenario']['behat_ui_steps'] = [
+        '#type' => 'fieldset',
+        '#title' => $this->t('Steps'),
+        '#collapsible' => TRUE,
+        '#collapsed' => FALSE,
+        '#tree' => TRUE,
+        '#prefix' => '<div id="behat-ui-new-steps">',
+        '#suffix' => '</div>',
+      ];
+      $storage = $form_state->getValues();
+      $stepCount = isset($storage['behat_ui_steps']) ? (count($storage['behat_ui_steps']) + 1) : 1;
+      if (isset($storage)) {
+        for ($i = 0; $i < $stepCount; $i++) {
+          $form['behat_ui_new_scenario']['behat_ui_steps'][$i] = [
+            '#type' => 'fieldset',
+            '#collapsible' => FALSE,
+            '#collapsed' => FALSE,
+            '#tree' => TRUE,
+          ];
 
-        $form['behat_ui_new_scenario']['behat_ui_steps'][$i]['type'] = [
-          '#type' => 'select',
-          '#options' => [
-            '' => '',
-            'Given' => 'Given',
-            'When' => 'When',
-            'Then' => 'Then',
-            'And' => 'And',
-            'But' => 'But',
-          ],
-          '#default_value' => '',
-        ];
+          $form['behat_ui_new_scenario']['behat_ui_steps'][$i]['type'] = [
+            '#type' => 'select',
+            '#options' => [
+              '' => '',
+              'Given' => 'Given',
+              'When' => 'When',
+              'Then' => 'Then',
+              'And' => 'And',
+              'But' => 'But',
+            ],
+            '#default_value' => '',
+          ];
 
-        $form['behat_ui_new_scenario']['behat_ui_steps'][$i]['step'] = [
-          '#type' => 'textfield',
-          '#maxlength' => 512,
-          '#autocomplete_route_name' => 'behat_ui.autocomplete',
-        ];
+          $form['behat_ui_new_scenario']['behat_ui_steps'][$i]['step'] = [
+            '#type' => 'textfield',
+            '#maxlength' => 512,
+            '#autocomplete_route_name' => 'behat_ui.autocomplete',
+          ];
+        }
       }
+
+      $form['behat_ui_new_scenario']['behat_ui_add_step'] = [
+        '#type' => 'button',
+        '#value' => $this->t('Add'),
+        '#href' => '',
+        '#ajax' => [
+          'callback' => '::ajaxAddStep',
+          'wrapper' => 'behat-ui-new-steps',
+        ],
+      ];
+
+      $form['behat_ui_new_scenario']['behat_ui_javascript'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Needs a real browser'),
+        '#default_value' => $config->get('behat_ui_needs_browser'),
+        '#description' => $this->t('Check this if this test needs a real browser, which supports JavaScript, in order to perform actions that happen without reloading the page.'),
+      ];
     }
+    elseif ($behat_ui_editing_mode == 'free_text') {
+      
+      $form['behat_ui_new_feature'] = [
+        '#type' => 'markup',
+        '#markup' => '<div class="layout-row clearfix">'
+        . '  <div class="layout-column layout-column--half">'
+        . '    <div id="behat-ui-new-scenario" class="panel">'
+        . '      <h3 class="panel__title">' . $this->t('New Feature') . '</h3>'
+        . '      <div class="panel__content">',
+      ];
 
-    $form['behat_ui_new_scenario']['behat_ui_add_step'] = [
-      '#type' => 'button',
-      '#value' => $this->t('Add'),
-      '#href' => '',
-      '#ajax' => [
-        'callback' => '::ajaxAddStep',
-        'wrapper' => 'behat-ui-new-steps',
-      ],
-    ];
+      $behat_ui_steps_link = new Url('behat_ui.behat_dl');
+      $form['behat_ui_new_feature']['behat_ui_steps_link'] = [
+        '#type' => 'markup',
+        '#markup' => '<a class="button use-ajax"
+              data-dialog-options="{&quot;width&quot;:500}" 
+              data-dialog-renderer="off_canvas" 
+              data-dialog-type="dialog"
+              href="' . $this->currentRequest->getSchemeAndHttpHost() . $behat_ui_steps_link->toString() . '" >' . $this->t('Check available steps') . '</a>',
+      ];
 
-    $form['behat_ui_new_scenario']['behat_ui_javascript'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Needs a real browser'),
-      '#default_value' => $config->get('behat_ui_needs_browser'),
-      '#description' => $this->t('Check this if this test needs a real browser, which supports JavaScript, in order to perform actions that happen without reloading the page.'),
-    ];
+      $behat_ui_steps_link_with_info = new Url('behat_ui.behat_di');
+      $form['behat_ui_new_feature']['behat_ui_steps_link_with_info'] = [
+        '#type' => 'markup',
+        '#markup' => '<a class="button use-ajax"
+              data-dialog-options="{&quot;width&quot;:500}" 
+              data-dialog-renderer="off_canvas" 
+              data-dialog-type="dialog"
+              href="' . $this->currentRequest->getSchemeAndHttpHost() . $behat_ui_steps_link_with_info->toString() . '" >' . $this->t('Full steps with info') . '</a>',
+      ];
+              
+      $form['behat_ui_new_feature']['free_text'] = [
+        '#type' => 'textarea',
+        '#rows' => 30,
+        '#resizable' => TRUE,
+        '#attributes' => [
+          'class' => ['free-text-ace-editor']
+        ],
+        '#default_value' => $this->getFeature(),
+      ];
+      $form['behat_ui_new_feature']['free_text_ace_editor'] = [
+        '#type' => 'markup',
+        '#markup' => '<div id="free_text_ace_editor">' . $this->getFeature() . '</div>',
+      ];
+      $form['#attached']['library'][] = 'behat_ui/ace-editor'; 
+    }
 
     // List of features in the selected behat features folder.
     $features_options = $this->getExistingFeatures();
@@ -254,14 +303,22 @@ class BehatUiNew extends FormBase {
 
     $behat_ui_behat_config_path = $config->get('behat_ui_behat_config_path');
     $behat_ui_behat_features_path = $config->get('behat_ui_behat_features_path');
+    $behat_ui_editing_mode = $config->get('behat_ui_editing_mode');
 
     if ($htmlIdofTriggeredElement == 'edit-behat-ui-create') {
       $formValues = $form_state->getValues();
 
       $file = $behat_ui_behat_config_path . '/' . $behat_ui_behat_features_path . '/' . $formValues['behat_ui_feature'] . '.feature';
-      $feature = file_get_contents($file);
-      $scenario = $this->generateScenario($formValues);
-      $content = $feature . "\n" . $scenario;
+
+      if ($behat_ui_editing_mode == 'guided_entry') {
+        $feature = file_get_contents($file);
+        $scenario = $this->generateScenario($formValues);
+        $content = $feature . "\n" . $scenario;
+      }
+      elseif ($behat_ui_editing_mode == 'free_text') {
+        $content = $formValues['free_text'];
+      }         
+
       $handle = fopen($file, 'w+');
       fwrite($handle, $content);
       fclose($handle);
@@ -316,6 +373,34 @@ class BehatUiNew extends FormBase {
     return $features;
   }
 
+  public function getFeature($feature_name='default.feature') {
+    $config = $this->configFactory->getEditable('behat_ui.settings');
+
+    $behat_ui_behat_config_path = $config->get('behat_ui_behat_config_path');
+    $behat_ui_behat_features_path = $config->get('behat_ui_behat_features_path');
+    
+    $default_feature_path = $behat_ui_behat_config_path . '/' . $behat_ui_behat_features_path . '/' . $feature_name;
+    
+    if (file_exists($default_feature_path)) {
+      return file_get_contents($default_feature_path);
+    }
+    else {
+      return '
+        Feature: Website requeirment: Website home page.
+          As a visitor to the website 
+          I want to navigate to the home page
+          So that I will be able to see all homepage content
+
+          @javascript @init @check
+          Scenario: check the welcome message at the homepage
+            Given I am an anonymous user
+            When I go to the homepage
+            Then I should see "No front page content has been created yet."
+      ';
+    }
+
+  }
+
   /**
    * Run a single test.
    */
@@ -330,16 +415,22 @@ class BehatUiNew extends FormBase {
     $behat_ui_html_report_dir = $config->get('behat_ui_html_report_dir');
     $behat_ui_log_report_dir = $config->get('behat_ui_log_report_dir');
     $behat_ui_save_user_testing_features = $config->get('behat_ui_save_user_testing_features');
+    $behat_ui_editing_mode = $config->get('behat_ui_editing_mode');
 
     $formValues = $form_state->getValues();
     // Write to temporary file.
     $file_user_time = 'user-' . date('Y-m-d_h-m-s');
     $file = $behat_ui_behat_config_path . '/' . $behat_ui_behat_features_path . '/' . $file_user_time . '.feature';
 
-    $title = $formValues['behat_ui_title'];
-    $test = "Feature: $title\n  In order to test \"$title\"\n\n";
+    if ($behat_ui_editing_mode == 'guided_entry') {
+      $title = $formValues['behat_ui_title'];
+      $test = "Feature: $title\n  In order to test \"$title\"\n\n";
+      $test .= $this->generateScenario($formValues);
+    }
+    elseif ($behat_ui_editing_mode == 'free_text') {
+      $test = $formValues['free_text'];
+    }
 
-    $test .= $this->generateScenario($formValues);
     $handle = fopen($file, 'w+');
     fwrite($handle, $test);
     fclose($handle);

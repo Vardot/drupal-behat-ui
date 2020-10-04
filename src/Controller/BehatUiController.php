@@ -294,7 +294,7 @@ class BehatUiController extends ControllerBase {
     $output = nl2br(htmlentities($output));
 
     $build = [
-      '#markup' => $this->formatBehatSteps($output, '<p>', '</p><p class="messages messages--status color-success">'),
+      '#markup' => $this->formatBehatSteps($output, '<code>', '</code><br /><hr /><br /><code>'),
     ];
     return $build;
   }
@@ -321,7 +321,7 @@ class BehatUiController extends ControllerBase {
   /**
    * Format Behat Steps.
    */
-  public function formatBehatSteps($behatSteps, $formatCodeBeginValue = '<p><code>', $formatCodeEndBeginValue = '</code></p><p class="messages messages--status color-success"><code>') {
+  public function formatBehatSteps($behatSteps, $formatCodeBeginValue = '<code>', $formatCodeEndBeginValue = '</code><br /><hr /><code>') {
 
     $formatedBehatSteps = str_replace('Given ', '<b>Given</b> ', $behatSteps);
     $formatedBehatSteps = str_replace('When ', '<b>When</b> ', $formatedBehatSteps);
@@ -338,6 +338,45 @@ class BehatUiController extends ControllerBase {
     $formatedBehatSteps = $formatCodeBeginValue . str_replace('default |', $formatCodeEndBeginValue, $formatedBehatSteps);
 
     return $formatedBehatSteps;
+  }
+  
+  public function getDefinitionStepsJson() {
+
+    $config = $this->configFactory->getEditable('behat_ui.settings');
+    $behat_bin = $config->get('behat_ui_behat_bin_path');
+    $behat_config_path = $config->get('behat_ui_behat_config_path');
+
+    $cmd = "cd $behat_config_path; $behat_bin -dl | sed 's/^\s*//g'";
+    $output = shell_exec($cmd);
+    
+    $output = str_replace("default |", "", $output);
+    $output = str_replace("/^", "", $output);
+    $output = str_replace("$/", "", $output);
+
+    $output = str_replace('Given|', 'Given', $output);
+    $output = str_replace('When|', 'When', $output);
+    $output = str_replace('Then|', 'Then', $output);
+    $output = str_replace('And|', 'And', $output);
+    $output = str_replace('But|', 'But', $output);
+
+    $output = str_replace('Given', 'BEHAT_UI_DELIMITERGiven', $output);
+    $output = str_replace('When', 'BEHAT_UI_DELIMITERWhen', $output);
+    $output = str_replace('Then', 'BEHAT_UI_DELIMITERThen', $output);
+    $output = str_replace('And', 'BEHAT_UI_DELIMITERAnd', $output);
+    $output = str_replace('But', 'BEHAT_UI_DELIMITERBut', $output);
+    
+    $output = str_replace('Given', '', $output);
+    $output = str_replace('When', '', $output);
+    $output = str_replace('Then', '', $output);
+    $output = str_replace('And', '', $output);
+    $output = str_replace('But', '', $output);
+
+    $behatList = [];
+
+    $behatList += explode("BEHAT_UI_DELIMITER", $output);
+    sort($behatList);
+
+    return new JsonResponse($behatList);
   }
 
 }

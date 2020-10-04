@@ -43,6 +43,16 @@ behat_ui.behat_di:
     _permission: 'create tests with behat ui'
   options:
     _admin_route: TRUE
+behat_ui.behat_dl_json:
+  path: '/admin/config/development/behat-ui/behat-dl-json'
+  defaults:
+    _title: 'Behat definition steps JSON'
+    _controller: '\Drupal\behat_ui\Controller\BehatUiController::getDefinitionStepsJson'
+  requirements:
+    _permission: 'create tests with behat ui'
+    _format: json
+  options:
+    _admin_route: TRUE
 behat_ui.status:
   path: '/behat-ui/status'
   defaults:

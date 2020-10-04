@@ -26,6 +26,9 @@ behat_ui.settings:
     behat_ui_log_report_dir:
       type: string
       label: 'Log report directory'
+    behat_ui_editing_mode:
+      type: string
+      label: 'Editing mode'
     behat_ui_http_user:
       type: string
       label: 'HTTP Authentication User'

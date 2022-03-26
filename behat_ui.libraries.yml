@@ -2,11 +2,11 @@ style:
   version: VERSION
   css:
     theme:
-      css/theme/behat-ui.style.theme.css: { }
+      css/theme/behat-ui.style.theme.css: {}
 run-tests-scripts:
   version: VERSION
   js:
-    js/behat-ui.run-tests.js: { }
+    js/behat-ui.run-tests.js: {}
   dependencies:
     - core/drupal
     - core/drupal.ajax
@@ -15,7 +15,7 @@ run-tests-scripts:
 new-test-scripts:
   version: VERSION
   js:
-    js/behat-ui.new-test.js: { }
+    js/behat-ui.new-test.js: {}
   dependencies:
     - core/drupal
     - core/drupal.ajax
@@ -29,8 +29,10 @@ ace-editor:
     url: https://ace.c9.io
   js:
     //pagecdn.io/lib/ace/1.4.12/ace.js: { type: external, minified: true }
-    //pagecdn.io/lib/ace/1.4.12/ext-language_tools.js: { type: external, minified: true }
-    //pagecdn.io/lib/ace/1.4.12/ext-keybinding_menu.js: { type: external, minified: true }
-    js/behat-ui.ace-editor.js: { }
+    //pagecdn.io/lib/ace/1.4.12/ext-language_tools.js:
+      { type: external, minified: true }
+    //pagecdn.io/lib/ace/1.4.12/ext-keybinding_menu.js:
+      { type: external, minified: true }
+    js/behat-ui.ace-editor.js: {}
   dependencies:
-      - core/jquery.ui.resizable
+    - core/jquery.ui.resizable

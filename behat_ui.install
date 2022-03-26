@@ -9,6 +9,7 @@
  * Implements hook_install().
  */
 function behat_ui_install() {
-  $install_message = t("Automated tests using Behat/Mink, Run tests, and create tests under Administration -> Configuration -> Development -> Behat UI");  \Drupal::logger('behat_ui')->notice($install_message);
+  $install_message = t("Automated tests using Behat/Mink, Run tests, and create tests under Administration -> Configuration -> Development -> Behat UI");
+  \Drupal::logger('behat_ui')->notice($install_message);
   \Drupal::messenger()->addWarning($install_message);
 }

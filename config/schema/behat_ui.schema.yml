@@ -4,46 +4,46 @@ behat_ui.settings:
   mapping:
     behat_ui_behat_config_path:
       type: string
-      label: 'Behat configuration path'
+      label: "Behat configuration path"
     behat_ui_behat_bin_path:
       type: string
-      label: 'Behat binary command path'
+      label: "Behat binary command path"
     behat_ui_behat_config_file:
       type: string
-      label: 'Behat configuration file name'
+      label: "Behat configuration file name"
     behat_ui_behat_features_path:
       type: string
-      label: 'Behat Features path' 
+      label: "Behat Features path"
     behat_ui_autoload_path:
       type: string
-      label: 'Vendor autoload path'
+      label: "Vendor autoload path"
     behat_ui_html_report:
       type: boolean
-      label: 'Enable HTML report'
+      label: "Enable HTML report"
     behat_ui_html_report_dir:
       type: string
-      label: 'HTML report directory'
+      label: "HTML report directory"
     behat_ui_log_report_dir:
       type: string
-      label: 'Log report directory'
+      label: "Log report directory"
     behat_ui_editing_mode:
       type: string
-      label: 'Editing mode'
+      label: "Editing mode"
     behat_ui_http_user:
       type: string
-      label: 'HTTP Authentication User'
+      label: "HTTP Authentication User"
     behat_ui_http_password:
       type: string
-      label: 'HTTP Authentication Password'
+      label: "HTTP Authentication Password"
     behat_ui_http_auth_headless_only:
       type: boolean
-      label: 'HTTP authentication only'
+      label: "HTTP authentication only"
     behat_ui_save_user_testing_features:
       type: boolean
-      label: 'Save user testing features'
+      label: "Save user testing features"
     behat_ui_needs_browser:
       type: boolean
-      label: 'Needs a real browser'
+      label: "Needs a real browser"
     behat_ui_behat_tags:
       type: string
-      label: 'Behat Tags'
+      label: "Behat Tags"

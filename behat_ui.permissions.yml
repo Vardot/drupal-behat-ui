@@ -1,9 +1,9 @@
 create tests with behat ui:
-  title: 'Create tests with Behat UI'
-  description: 'Be able to create testing scenarios and be able to run them. Download own created scenarios.'
+  title: "Create tests with Behat UI"
+  description: "Be able to create testing scenarios and be able to run them. Download own created scenarios."
 run all tests in behat ui:
-  title: 'Run all tests in Behat UI'
-  description: 'Be able to run all tests in the selected Behat Features path.'
+  title: "Run all tests in Behat UI"
+  description: "Be able to run all tests in the selected Behat Features path."
 administer behat ui settings:
-  title: 'Administer Behat UI settings'
-  description: 'Be able to change Behat UI settings.'
+  title: "Administer Behat UI settings"
+  description: "Be able to change Behat UI settings."

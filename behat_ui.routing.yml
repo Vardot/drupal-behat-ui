@@ -1,96 +1,96 @@
 behat_ui.run_tests:
-  path: '/admin/config/development/behat-ui'
+  path: "/admin/config/development/behat-ui"
   defaults:
-    _title: 'Behat UI'
+    _title: "Behat UI"
     _form: \Drupal\behat_ui\Form\BehatUiRunTests
   requirements:
-    _permission: 'run all tests in behat ui'
+    _permission: "run all tests in behat ui"
   options:
     _admin_route: TRUE
 behat_ui.settings:
-  path: '/admin/config/development/behat-ui/settings'
+  path: "/admin/config/development/behat-ui/settings"
   defaults:
-    _title: 'Behat UI'
+    _title: "Behat UI"
     _form: \Drupal\behat_ui\Form\BehatUiSettings
   requirements:
-    _permission: 'administer behat ui settings'
+    _permission: "administer behat ui settings"
   options:
     _admin_route: TRUE
 behat_ui.new:
-  path: '/admin/config/development/behat-ui/new'
+  path: "/admin/config/development/behat-ui/new"
   defaults:
-    _title: 'Create test'
+    _title: "Create test"
     _form: \Drupal\behat_ui\Form\BehatUiNew
   requirements:
-    _permission: 'create tests with behat ui'
+    _permission: "create tests with behat ui"
   options:
     _admin_route: TRUE
 behat_ui.behat_dl:
-  path: '/admin/config/development/behat-ui/behat-dl'
+  path: "/admin/config/development/behat-ui/behat-dl"
   defaults:
-    _title: 'Behat definition steps'
+    _title: "Behat definition steps"
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::getDefinitionSteps'
   requirements:
-    _permission: 'create tests with behat ui'
+    _permission: "create tests with behat ui"
   options:
     _admin_route: TRUE
 behat_ui.behat_di:
-  path: '/admin/config/development/behat-ui/behat-di'
+  path: "/admin/config/development/behat-ui/behat-di"
   defaults:
-    _title: 'Behat definitions steps with extended info'
+    _title: "Behat definitions steps with extended info"
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::getDefinitionStepsWithInfo'
   requirements:
-    _permission: 'create tests with behat ui'
+    _permission: "create tests with behat ui"
   options:
     _admin_route: TRUE
 behat_ui.behat_dl_json:
-  path: '/admin/config/development/behat-ui/behat-dl-json'
+  path: "/admin/config/development/behat-ui/behat-dl-json"
   defaults:
-    _title: 'Behat definition steps JSON'
+    _title: "Behat definition steps JSON"
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::getDefinitionStepsJson'
   requirements:
-    _permission: 'create tests with behat ui'
+    _permission: "create tests with behat ui"
     _format: json
   options:
     _admin_route: TRUE
 behat_ui.status:
-  path: '/behat-ui/status'
+  path: "/behat-ui/status"
   defaults:
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::getTestStatus'
   requirements:
-    _permission: 'run all tests in behat ui+create tests with behat ui'
+    _permission: "run all tests in behat ui+create tests with behat ui"
   options:
     _admin_route: TRUE
 behat_ui.report:
-  path: '/behat-ui/report'
+  path: "/behat-ui/report"
   defaults:
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::getTestStatusReport'
   requirements:
-    _permission: 'run all tests in behat ui+create tests with behat ui'
+    _permission: "run all tests in behat ui+create tests with behat ui"
   options:
     _admin_route: TRUE
 behat_ui.autocomplete:
-  path: '/behat-ui/autocomplete'
+  path: "/behat-ui/autocomplete"
   defaults:
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::autocompleteStep'
     _format: json
   requirements:
-    _permission: 'create tests with behat ui'
+    _permission: "create tests with behat ui"
   options:
     _admin_route: TRUE
 behat_ui.kill:
-  path: '/behat-ui/kill'
+  path: "/behat-ui/kill"
   defaults:
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::kill'
   requirements:
-    _permission: 'run all tests in behat ui'
+    _permission: "run all tests in behat ui"
   options:
     _admin_route: TRUE
 behat_ui.download:
-  path: '/behat-ui/download/{format}'
+  path: "/behat-ui/download/{format}"
   defaults:
     _controller: '\Drupal\behat_ui\Controller\BehatUiController::download'
   requirements:
-    _permission: 'create tests with behat ui'
+    _permission: "create tests with behat ui"
   options:
     _admin_route: TRUE

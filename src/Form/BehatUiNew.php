@@ -190,7 +190,7 @@ class BehatUiNew extends FormBase {
       ];
     }
     elseif ($behat_ui_editing_mode == 'free_text') {
-      
+
       $form['behat_ui_new_feature'] = [
         '#type' => 'markup',
         '#markup' => '<div class="layout-row clearfix">'
@@ -219,13 +219,13 @@ class BehatUiNew extends FormBase {
               data-dialog-type="dialog"
               href="' . $this->currentRequest->getSchemeAndHttpHost() . $behat_ui_steps_link_with_info->toString() . '" >' . $this->t('Full steps with info') . '</a>',
       ];
-              
+
       $form['behat_ui_new_feature']['free_text'] = [
         '#type' => 'textarea',
         '#rows' => 30,
         '#resizable' => TRUE,
         '#attributes' => [
-          'class' => ['free-text-ace-editor']
+          'class' => ['free-text-ace-editor'],
         ],
         '#default_value' => $this->getFeature(),
       ];
@@ -233,7 +233,7 @@ class BehatUiNew extends FormBase {
         '#type' => 'markup',
         '#markup' => '<div id="free_text_ace_editor">' . $this->getFeature() . '</div>',
       ];
-      $form['#attached']['library'][] = 'behat_ui/ace-editor'; 
+      $form['#attached']['library'][] = 'behat_ui/ace-editor';
     }
 
     // List of features in the selected behat features folder.
@@ -317,7 +317,7 @@ class BehatUiNew extends FormBase {
       }
       elseif ($behat_ui_editing_mode == 'free_text') {
         $content = $formValues['free_text'];
-      }         
+      }
 
       $handle = fopen($file, 'w+');
       fwrite($handle, $content);
@@ -373,14 +373,14 @@ class BehatUiNew extends FormBase {
     return $features;
   }
 
-  public function getFeature($feature_name='default.feature') {
+  public function getFeature($feature_name = 'default.feature') {
     $config = $this->configFactory->getEditable('behat_ui.settings');
 
     $behat_ui_behat_config_path = $config->get('behat_ui_behat_config_path');
     $behat_ui_behat_features_path = $config->get('behat_ui_behat_features_path');
-    
+
     $default_feature_path = $behat_ui_behat_config_path . '/' . $behat_ui_behat_features_path . '/' . $feature_name;
-    
+
     if (file_exists($default_feature_path)) {
       return file_get_contents($default_feature_path);
     }

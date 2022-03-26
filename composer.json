@@ -33,7 +33,7 @@
     }
   },
   "require": {
-    "drupal/core": "~9",
+    "drupal/core": "^9",
     "drupal/drupal-extension": "~4.0",
     "emuse/behat-html-formatter": "^0.2.0"
   }

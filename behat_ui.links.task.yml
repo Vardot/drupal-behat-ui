@@ -1,16 +1,16 @@
 behat_ui.run_tests:
   route_name: behat_ui.run_tests
-  title: 'Run tests'
+  title: "Run tests"
   weight: 10
   base_route: behat_ui.run_tests
 behat_ui.new:
   route_name: behat_ui.new
-  title: 'Create test'
+  title: "Create test"
   weight: 20
   base_route: behat_ui.run_tests
 behat_ui.settings:
   route_name: behat_ui.settings
-  title: 'Settings'
+  title: "Settings"
   weight: 30
   base_route: behat_ui.run_tests
 #behat_ui.behat_dl:

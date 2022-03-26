@@ -339,7 +339,7 @@ class BehatUiController extends ControllerBase {
 
     return $formatedBehatSteps;
   }
-  
+
   public function getDefinitionStepsJson() {
 
     $config = $this->configFactory->getEditable('behat_ui.settings');
@@ -348,7 +348,7 @@ class BehatUiController extends ControllerBase {
 
     $cmd = "cd $behat_config_path; $behat_bin -dl | sed 's/^\s*//g'";
     $output = shell_exec($cmd);
-    
+
     $output = str_replace("default |", "", $output);
     $output = str_replace("/^", "", $output);
     $output = str_replace("$/", "", $output);
@@ -364,7 +364,7 @@ class BehatUiController extends ControllerBase {
     $output = str_replace('Then', 'BEHAT_UI_DELIMITERThen', $output);
     $output = str_replace('And', 'BEHAT_UI_DELIMITERAnd', $output);
     $output = str_replace('But', 'BEHAT_UI_DELIMITERBut', $output);
-    
+
     $output = str_replace('Given', '', $output);
     $output = str_replace('When', '', $output);
     $output = str_replace('Then', '', $output);

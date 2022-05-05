@@ -2,5 +2,5 @@ name: "Behat UI"
 description: "Create and run Behat/Mink tests from the web interface"
 type: module
 configure: behat_ui.settings
-core_version_requirement: ^9
+core_version_requirement: ^9 || ^10
 dependencies: []

@@ -121,7 +121,8 @@ class BehatUiController extends ControllerBase {
         $log_report = $behat_ui_log_report_dir . '/bethat-ui-test.log';
 
         if ($log_report && file_exists($log_report)) {
-          $output = nl2br(htmlentities(file_get_contents($log_report)));
+          $file_content = file_get_contents($log_report);
+          $output = nl2br(htmlentities($file_content ?? ''));
         }
         else {
           $output = $this->t('No Console log test report yet!');
@@ -267,7 +268,7 @@ class BehatUiController extends ControllerBase {
 
     $command = "cd $behat_config_path; $behat_bin -dl | sed 's/^\s*//g'";
     $output = shell_exec($command);
-    $output = nl2br(htmlentities($output));
+    $output = nl2br(htmlentities($output ?? ''));
 
     $output = str_replace('default |', '', $output);
     $output = str_replace('Given', '', $output);
@@ -291,7 +292,7 @@ class BehatUiController extends ControllerBase {
 
     $cmd = "cd $behat_config_path; $behat_bin -dl | sed 's/^\s*//g'";
     $output = shell_exec($cmd);
-    $output = nl2br(htmlentities($output));
+    $output = nl2br(htmlentities($output ?? ''));
 
     $build = [
       '#markup' => $this->formatBehatSteps($output, '<code>', '</code><br /><hr /><br /><code>'),
@@ -310,7 +311,7 @@ class BehatUiController extends ControllerBase {
 
     $command = "cd $behat_config_path; $behat_bin -di";
     $output = shell_exec($command);
-    $output = nl2br(htmlentities($output));
+    $output = nl2br(htmlentities($output ?? ''));
 
     $build = [
       '#markup' => $this->formatBehatSteps($output),
@@ -349,9 +350,9 @@ class BehatUiController extends ControllerBase {
     $cmd = "cd $behat_config_path; $behat_bin -dl | sed 's/^\s*//g'";
     $output = shell_exec($cmd);
 
-    $output = str_replace("default |", "", $output);
-    $output = str_replace("/^", "", $output);
-    $output = str_replace("$/", "", $output);
+    $output = str_replace("default |", '', $output);
+    $output = str_replace("/^", '', $output);
+    $output = str_replace("$/", '', $output);
 
     $output = str_replace('Given|', 'Given', $output);
     $output = str_replace('When|', 'When', $output);

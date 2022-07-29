@@ -241,7 +241,7 @@ class BehatUiNew extends FormBase {
     $features_default_value = 'default';
     if (count($features_options) > 0) {
       if (!isset($features_options['default'])) {
-        $features_default_value = array_key_first($features_default_value);
+        $features_default_value = array_key_first(array($features_default_value));
       }
     }
     $form['behat_ui_new_scenario']['behat_ui_feature'] = [

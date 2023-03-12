@@ -108,8 +108,8 @@ class BehatUiRunTests extends FormBase {
     $behat_ui_html_report_dir = $config->get('behat_ui_html_report_dir');
     $behat_ui_log_report_dir = $config->get('behat_ui_log_report_dir');
 
-    $beaht_ui_tempstore_collection = $this->tempStore->get('behat_ui');
-    $pid = $beaht_ui_tempstore_collection->get('behat_ui_pid');
+    $behat_ui_tempstore_collection = $this->tempStore->get('behat_ui');
+    $pid = $behat_ui_tempstore_collection->get('behat_ui_pid');
 
     $label = $this->t('Not running');
     $class = '';
@@ -208,22 +208,26 @@ class BehatUiRunTests extends FormBase {
     $behat_ui_html_report_dir = $config->get('behat_ui_html_report_dir');
     $behat_ui_log_report_dir = $config->get('behat_ui_log_report_dir');
 
-    $beaht_ui_tempstore_collection = $this->tempStore->get('behat_ui');
-    $pid = $beaht_ui_tempstore_collection->get('behat_ui_pid');
+    $behat_ui_tempstore_collection = $this->tempStore->get('behat_ui');
+    $pid = $behat_ui_tempstore_collection->get('behat_ui_pid');
 
-    $command = '';
+    $command = [];
 
     if ($pid && posix_kill(intval($pid), 0)) {
       $form_state->setErrorByName('submit_button', $this->t('Tests are already running!'));
     }
     else {
 
-      $command = '';
+      $command = [];
       if ($behat_ui_html_report) {
 
         if (isset($behat_ui_html_report_dir) && $behat_ui_html_report_dir != '') {
           if ($this->fileSystem->prepareDirectory($behat_ui_html_report_dir, FileSystemInterface::CREATE_DIRECTORY)) {
-            $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file $behat_ui_behat_features_path --format pretty --out std --format html --out $behat_ui_html_report_dir";
+            $command[] = "cd $behat_ui_behat_config_path";
+            $command[] = "$behat_ui_behat_bin_path";
+            $command[] = "--config=$behat_ui_behat_config_file $behat_ui_behat_features_path";
+            $command[] = "--format pretty --out std --format html";
+            $command[] = "--out $behat_ui_html_report_dir";
           }
           else {
             $form_state->setErrorByName('submit_button', $this->t('The HTML Output directory does not exists or is not writable.'));
@@ -239,7 +243,7 @@ class BehatUiRunTests extends FormBase {
 
           if ($this->fileSystem->prepareDirectory($behat_ui_log_report_dir, FileSystemInterface::CREATE_DIRECTORY)) {
             $log_report_output_file = $behat_ui_log_report_dir . "/bethat-ui-test.log";
-            $command = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file $behat_ui_behat_features_path --format pretty --out std > $log_report_output_file&";
+            $command[] = "cd $behat_ui_behat_config_path;$behat_ui_behat_bin_path --config=$behat_ui_behat_config_file $behat_ui_behat_features_path --format pretty --out std > $log_report_output_file&";
           }
           else {
             $form_state->setErrorByName('submit_button', $this->t('The Log Output directory does not exists or is not writable.'));
@@ -257,7 +261,7 @@ class BehatUiRunTests extends FormBase {
         $process->start();
         $new_pid = $process->getPid() + 1;
         $this->messenger->addMessage($this->t("Started running tests using prcess ID: @pid", ["@pid" => $new_pid]));
-        $beaht_ui_tempstore_collection->set('behat_ui_pid', $new_pid);
+        $behat_ui_tempstore_collection->set('behat_ui_pid', $new_pid);
 
         if (!$process->isSuccessful()) {
           $this->messenger->addMessage($process->getErrorOutput());

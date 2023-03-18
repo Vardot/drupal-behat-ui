@@ -35,6 +35,6 @@
   "require": {
     "drupal/core": "^9 || ^10",
     "drupal/drupal-extension": "~4.0 || ~5.0",
-    "emuse/behat-html-formatter": "^0.2.0"
+    "webship/behat-html-formatter": "~1.0"
   }
 }

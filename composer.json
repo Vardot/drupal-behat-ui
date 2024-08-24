@@ -33,8 +33,8 @@
     }
   },
   "require": {
-    "drupal/core": "^9 || ^10",
-    "drupal/drupal-extension": "~4.0",
-    "emuse/behat-html-formatter": "^0.2.0"
+    "drupal/core": "^10 || ^11",
+    "drupal/drupal-extension": "~5.0",
+    "webship/behat-html-formatter": "~1.0"
   }
 }
